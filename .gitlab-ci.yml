@@ -1,0 +1,44 @@
+image: java:8-jdk
+
+stages:
+  - build
+  - publish
+
+before_script:
+  - echo "Start CI"
+  - echo `pwd`
+  - echo "$CI_BUILD_NAME, $CI_BUILD_REF_NAME $CI_BUILD_STAGE"
+  - export GRADLE_USER_HOME=`pwd`/.gradle
+
+cache:
+  paths:
+    - .gradle/wrapper
+    - .gradle/caches
+
+build:
+  stage: build
+  script:
+    - chmod +x ./gradlew
+    - ./gradlew build
+  artifacts:
+    when: on_success
+    paths:
+      - build/libs/*.*
+    expire_in: 1 week
+  only:
+    - dev
+  tags:
+    - common
+
+publish:
+  stage: publish
+  script:
+    - chmod +x ./gradlew
+    - ./gradlew publish -Pusername=$NEXUS_USERNAME -Ppassword=$NEXUS_PASSWORD
+  only:
+    - tags
+  tags:
+    - common
+
+after_script:
+  - echo "End CI"

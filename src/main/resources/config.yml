@@ -1,0 +1,5 @@
+debug:
+  enable: false
+  dir: "DragonCoreGui/debug"
+  produce-yaml: "%gui_key%-produceYaml.yml"
+  #产出的 yaml

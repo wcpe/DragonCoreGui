@@ -43,6 +43,18 @@ abstract class AbstractDragonCoreCompose(
     open val actionCallBackMap: MutableMap<String, BiConsumer<List<String>, Player>> = mutableMapOf()
     private val actionCallBackGetMethodMap: MutableMap<String, List<String>> = mutableMapOf()
 
+    private val customKeyValueMap: MutableMap<String, String> = mutableMapOf()
+
+    /**
+     * 添加自定义 属性值
+     *
+     * @param key key
+     * @param value value
+     */
+    fun addCustomKeyValue(key: String, value: String) {
+        customKeyValueMap[key] = value
+    }
+
     /**
      * 添加一个 action
      *
@@ -77,6 +89,9 @@ abstract class AbstractDragonCoreCompose(
 
     open fun convertToConfiguration(): MemoryConfiguration {
         return DragonCoreGuiYaml().also { yaml ->
+            for ((key, value) in customKeyValueMap) {
+                yaml[key] = value
+            }
             yaml["type"] = type
             yaml["extends"] = extends
             yaml["x"] = x

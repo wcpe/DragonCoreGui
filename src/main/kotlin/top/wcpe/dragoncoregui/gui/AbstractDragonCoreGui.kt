@@ -107,15 +107,26 @@ abstract class AbstractDragonCoreGui(
 
             dragonCoreGuiComposeMap[fullPath]?.let { composeMap ->
                 for ((key, value) in composeMap) {
-                    newYaml[key] = value.convertToConfiguration().apply {
-                        val actionsConfig = getConfigurationSection("actions") ?: return@apply
-                        for (actionKey in actionsConfig.getKeys(false)) {
-                            actionsConfig.set(
-                                actionKey, actionsConfig.getString(actionKey).replace(
-                                    "%gui_full_path%", fullPath
-                                )
-                            )
+                    val convertToConfiguration = value.convertToConfiguration()
+                    for (convertKey in value.convertToConfiguration().getKeys(false)) {
+                        when (convertKey) {
+                            "actions" -> {
+                                val actionsConfig =
+                                    convertToConfiguration.getConfigurationSection("actions") ?: continue
+                                for (actionKey in actionsConfig.getKeys(false)) {
+                                    actionsConfig.set(
+                                        actionKey, actionsConfig.getString(actionKey).replace(
+                                            "%gui_full_path%", fullPath
+                                        )
+                                    )
+                                }
+                            }
+
+                            else -> {
+                                newYaml["$key.$convertKey"] = convertToConfiguration.get(convertKey)
+                            }
                         }
+
                     }
                 }
             }
@@ -151,6 +162,7 @@ abstract class AbstractDragonCoreGui(
         dragonCoreGuiComposeMap.computeIfAbsent(fullPath) {
             mutableMapOf()
         }[compose.key] = compose
+
     }
 
     fun addFunction(dragonCoreGuiFunction: DragonCoreGuiFunctions, function: String) {

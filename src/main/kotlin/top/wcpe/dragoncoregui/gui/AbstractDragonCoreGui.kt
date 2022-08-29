@@ -158,6 +158,9 @@ abstract class AbstractDragonCoreGui(
         }
     }
 
+    /**
+     * 清理缓存的 Compose
+     */
     fun clearCompose() {
         dragonCoreGuiComposeMap[fullPath]?.clear()
     }
@@ -167,6 +170,13 @@ abstract class AbstractDragonCoreGui(
             mutableMapOf()
         }[compose.key] = compose
 
+    }
+
+    /**
+     * 清理缓存的 Function
+     */
+    fun clearFunction() {
+        functions.clear()
     }
 
     fun addFunction(dragonCoreGuiFunction: DragonCoreGuiFunctions, function: String) {
@@ -179,6 +189,13 @@ abstract class AbstractDragonCoreGui(
         functions.computeIfAbsent(dragonCoreGuiFunction) {
             mutableListOf()
         }.addAll(function)
+    }
+
+    /**
+     * 清理缓存的 CustomFunction
+     */
+    fun clearCustomFunction() {
+        customFunctions.clear()
     }
 
     fun addCustomFunction(functionName: String, functionBody: String) {

@@ -142,6 +142,10 @@ abstract class AbstractDragonCoreGui(
         PacketSender.sendOpenGui(player, "$fullPath")
     }
 
+    fun getValue(path: String): String {
+        return baseYamlConfiguration.getString(path)
+    }
+
     fun removePlaceholder(vararg players: Player, key: String) {
         for (player in players) {
             PacketSender.sendDeletePlaceholderCache(player, key, false)

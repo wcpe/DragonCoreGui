@@ -120,6 +120,7 @@ abstract class AbstractDragonCoreGui(
                                         )
                                     )
                                 }
+                                newYaml["$key.actions"] = actionsConfig
                             }
 
                             else -> {

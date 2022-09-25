@@ -1,12 +1,19 @@
+buildscript {
+    ext {
+        kotlin_version = "1.7.10"
+    }
+}
+
 plugins {
+    id 'idea'
     id 'java'
-    id 'org.jetbrains.kotlin.jvm' version '1.7.10'
+    id 'org.jetbrains.kotlin.jvm' version "${kotlin_version}"
     id 'maven-publish'
-    id 'org.jetbrains.dokka' version "1.7.10"
+    id 'org.jetbrains.dokka' version "${kotlin_version}"
 }
 
 group = 'top.wcpe'
-version = '1.0.1-alpha-dev-5'
+version = '1.0.1'
 
 processResources {
     def props = [version: version]
@@ -36,11 +43,32 @@ dependencies {
     compileOnly 'org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT'
     compileOnly 'eos.moe.dragoncore:DragonCore:2.4.7'
 
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib'
-    testImplementation 'org.jetbrains.kotlin:kotlin-test'
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-common:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation "org.jetbrains:annotations:23.0.0"
 
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+    testImplementation 'org.jetbrains.kotlin:kotlin-test'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
+}
+
+def targetJavaVersion = 8
+java {
+    def javaVersion = JavaVersion.toVersion(targetJavaVersion)
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+    if (JavaVersion.current() < javaVersion) {
+        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
+        options.release = targetJavaVersion
+    }
 }
 
 tasks.withType(JavaCompile) {
@@ -52,11 +80,17 @@ test {
 }
 
 compileKotlin {
-    kotlinOptions.jvmTarget = '1.8'
+    kotlinOptions {
+        jvmTarget = '1.8'
+        freeCompilerArgs += "-Xjvm-default=all-compatibility"
+    }
 }
 
 compileTestKotlin {
-    kotlinOptions.jvmTarget = '1.8'
+    kotlinOptions {
+        jvmTarget = '1.8'
+        freeCompilerArgs += "-Xjvm-default=all-compatibility"
+    }
 }
 
 task sourcesJar(type: Jar) {

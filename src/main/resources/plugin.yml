@@ -1,10 +1,12 @@
 name: DragonCoreGui
 main: top.wcpe.dragoncoregui.DragonCoreGui
 version: "${version}"
-author: QQ1837019522
-website: [ "https://github.com/wcpe" ]
+author: "WCPE QQ1837019522"
+website: "https://github.com/wcpe"
 commands:
   dragoncoregui:
     description: main commands
-    aliases: [ "dcg","coregui" ]
+    aliases:
+      - "dcg"
+      - "coregui"
     permission: "dragoncoregui.use"

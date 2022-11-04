@@ -19,6 +19,7 @@ class DragonCoreGui : JavaPlugin() {
     companion object {
         @JvmStatic
         lateinit var instance: DragonCoreGui
+            private set
     }
 
     override fun onEnable() {

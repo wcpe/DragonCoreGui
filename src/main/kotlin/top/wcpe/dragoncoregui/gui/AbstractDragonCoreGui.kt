@@ -1,5 +1,6 @@
 package top.wcpe.dragoncoregui.gui
 
+import eos.moe.dragoncore.config.Config
 import eos.moe.dragoncore.network.PacketSender
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
@@ -140,7 +141,21 @@ abstract class AbstractDragonCoreGui(
                 )
             }
         })
-        PacketSender.sendOpenGui(player, "$fullPath")
+        if ("hud".equals(match, true)) {
+            PacketSender.sendOpenHud(player, fullPath)
+        } else {
+            PacketSender.sendOpenGui(player, fullPath)
+        }
+    }
+
+
+    /**
+     * 清空玩家缓存 Yaml
+     * 达到清空 HUD 的效果
+     * 暂时使用该方法清空
+     */
+    fun clearCacheYaml(player: Player) {
+        Config.sendYamlToClient(player)
     }
 
     fun getValue(path: String): String {

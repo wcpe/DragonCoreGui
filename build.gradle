@@ -13,13 +13,13 @@ plugins {
 }
 
 group = 'top.wcpe'
-version = '1.0.1'
+version = '1.0.2-alpha-dev-1'
 
 processResources {
     def props = [version: version]
     inputs.properties props
     filteringCharset 'UTF-8'
-    filesMatching(['plugin.yml']){
+    filesMatching(['plugin.yml']) {
         expand props
     }
     from('src/main/java') {

@@ -150,12 +150,17 @@ abstract class AbstractDragonCoreGui(
 
 
     /**
-     * 清空玩家缓存 Yaml
-     * 达到清空 HUD 的效果
-     * 暂时使用该方法清空
+     * 清空玩家缓存 Yaml 并将龙之核心配置文件夹下的配置全发送过去
      */
     fun clearCacheYaml(player: Player) {
         Config.sendYamlToClient(player)
+    }
+
+    /**
+     * 关闭 HUD
+     */
+    fun closeHUD(player: Player) {
+        PacketSender.sendRunFunction(player, fullPath, "方法.关闭界面", false)
     }
 
     fun getValue(path: String): String {

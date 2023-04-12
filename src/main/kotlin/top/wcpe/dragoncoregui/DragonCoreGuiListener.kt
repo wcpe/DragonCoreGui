@@ -1,11 +1,15 @@
 package top.wcpe.dragoncoregui
 
 import eos.moe.dragoncore.api.gui.event.CustomPacketEvent
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import top.wcpe.dragoncoregui.compose.AbstractDragonCoreCompose
 import top.wcpe.dragoncoregui.compose.DragonCoreComposeAction
-import top.wcpe.dragoncoregui.gui.AbstractDragonCoreGui
 import top.wcpe.dragoncoregui.gui.DragonCoreGuiFunctions
+import top.wcpe.dragoncoregui.gui.DragonCoreGuiManager
+import java.util.function.BiConsumer
+import java.util.function.Consumer
 
 /**
  * 由 WCPE 在 2022/7/19 1:14 创建
@@ -36,12 +40,20 @@ class DragonCoreGuiListener : Listener {
                     return
                 }
                 val composeKey = data[2]
-
-                (((AbstractDragonCoreGui.dragonCoreGuiComposeMap[dragonCoreGuiFullPath] ?: return)[composeKey]
-                    ?: return).actionCallBackMap[action] ?: return).accept(
-                    data.subList(3, data.size),
-                    e.player
-                )
+                val player = e.player
+                DragonCoreGuiManager.consumerDragonCoreGui(dragonCoreGuiFullPath) { dragonCoreGui ->
+                    val consumer = Consumer<AbstractDragonCoreCompose> { compose ->
+                        compose.consumerActionCallBack(action) { action ->
+                            action.accept(
+                                data.subList(3, data.size), player
+                            )
+                        }
+                    }
+                    dragonCoreGui.consumerCompose(composeKey, consumer)
+                    dragonCoreGui.consumerPlayerDragonCoreGuiExpandConfig(player) { dragonCoreGuiExpandConfig ->
+                        dragonCoreGuiExpandConfig.consumerCompose(composeKey, consumer)
+                    }
+                }
             }
 
             "DragonCoreGui_Functions" -> {
@@ -49,16 +61,21 @@ class DragonCoreGuiListener : Listener {
                     return
                 }
                 val dragonCoreGuiFullPath = e.data[0]
-                val function = e.data[1]
-                if (!functionsMap.containsKey(function)) {
+                val functionKey = e.data[1]
+                if (!functionsMap.containsKey(functionKey)) {
                     return
                 }
-                ((AbstractDragonCoreGui.dragonCoreGuiFunctionsCallBack[dragonCoreGuiFullPath]
-                    ?: return)[function]
-                    ?: return).accept(
-                    dragonCoreGuiFullPath,
-                    e.player
-                )
+                val player = e.player
+                DragonCoreGuiManager.consumerDragonCoreGui(dragonCoreGuiFullPath) { dragonCoreGui ->
+                    val consumer = Consumer<BiConsumer<String, Player>> { function ->
+                        function.accept(dragonCoreGuiFullPath, player)
+                    }
+
+                    dragonCoreGui.consumerFunctionsCallBack(functionKey, consumer)
+                    dragonCoreGui.consumerPlayerDragonCoreGuiExpandConfig(player) { dragonCoreGuiExpandConfig ->
+                        dragonCoreGuiExpandConfig.consumerFunctionsCallBack(functionKey, consumer)
+                    }
+                }
             }
         }
     }

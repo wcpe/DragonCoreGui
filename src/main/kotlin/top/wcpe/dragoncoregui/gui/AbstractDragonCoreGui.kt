@@ -5,12 +5,14 @@ import eos.moe.dragoncore.network.PacketSender
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import top.wcpe.dragoncoregui.DragonCoreGui
+import top.wcpe.dragoncoregui.DragonCoreGui.Companion.debug
 import top.wcpe.dragoncoregui.compose.AbstractDragonCoreCompose
 import top.wcpe.dragoncoregui.yaml.DragonCoreGuiYaml
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.function.BiConsumer
+import java.util.function.Consumer
 
 /**
  * 由 WCPE 在 2022/7/18 3:37 创建
@@ -33,18 +35,25 @@ abstract class AbstractDragonCoreGui(
     open var hideHud: String = "",
     open var import: String = "",
 ) {
-    private val functions: MutableMap<DragonCoreGuiFunctions, MutableList<String>> = mutableMapOf()
-    private val customFunctions: MutableMap<String, MutableList<String>> = mutableMapOf()
 
-    companion object {
-        @JvmStatic
-        val dragonCoreGuiComposeMap = mutableMapOf<String, MutableMap<String, AbstractDragonCoreCompose>>()
+    private val dragonCoreGuiExpandConfig = DragonCoreGuiExpandConfig()
 
-        @JvmStatic
-        val dragonCoreGuiFunctionsCallBack = mutableMapOf<String, MutableMap<String, BiConsumer<String, Player>>>()
+    /**
+     * Player's Name to DragonCoreGuiExpandConfig
+     */
+    private val playerDragonCoreGuiExpandConfigMap = mutableMapOf<String, DragonCoreGuiExpandConfig>()
+
+    fun consumerCompose(composeKey: String, consumer: Consumer<AbstractDragonCoreCompose>) {
+        dragonCoreGuiExpandConfig.consumerCompose(composeKey, consumer)
     }
 
-    private val fullPath = "$path$fileName"
+    fun consumerFunctionsCallBack(functionKey: String, consumer: Consumer<BiConsumer<String, Player>>) {
+        dragonCoreGuiExpandConfig.consumerFunctionsCallBack(functionKey, consumer)
+    }
+
+
+    val fullPath = "$path$fileName"
+
     private val logger = DragonCoreGui.instance.logger
 
     private val file = DragonCoreGui.instance.dataFolder.toPath().parent.resolve(path).also {
@@ -52,12 +61,18 @@ abstract class AbstractDragonCoreGui(
     }.toFile()
 
     init {
-        reload()
+        this.reload()
+        this.register()
     }
+
+    private fun register() {
+        DragonCoreGuiManager.registerDragonCoreGui(this)
+    }
+
 
     private lateinit var baseYamlConfiguration: YamlConfiguration
 
-    fun reload() {
+    open fun reload() {
         baseYamlConfiguration = YamlConfiguration.loadConfiguration(File(file, "$fileName.yml"))
         logger.info("load base gui yaml $fullPath success!")
     }
@@ -68,9 +83,99 @@ abstract class AbstractDragonCoreGui(
         ).resolve(file)
     }
 
-    fun openGui(player: Player) {
-        val debug = DragonCoreGui.instance.config.getBoolean("debug.enable")
+    fun consumerPlayerDragonCoreGuiExpandConfig(player: Player, consumer: Consumer<DragonCoreGuiExpandConfig>) {
+        consumer.accept(playerDragonCoreGuiExpandConfigMap.computeIfAbsent(player.name) {
+            DragonCoreGuiExpandConfig()
+        })
+    }
+
+    /**
+     * 清理玩家所有 Compose
+     */
+    open fun clearCompose(player: Player) {
+        consumerPlayerDragonCoreGuiExpandConfig(player) { dragonCoreGuiExpandConfig ->
+            dragonCoreGuiExpandConfig.clearCompose()
+        }
+    }
+
+    /**
+     * 给单独玩家添加 Compose
+     */
+    open fun addCompose(player: Player, compose: AbstractDragonCoreCompose) {
+        consumerPlayerDragonCoreGuiExpandConfig(player) { dragonCoreGuiExpandConfig ->
+            dragonCoreGuiExpandConfig.addCompose(compose)
+        }
+    }
+
+    /**
+     * 清理玩家所有 Function
+     */
+    open fun clearFunction(player: Player) {
+        consumerPlayerDragonCoreGuiExpandConfig(player) { dragonCoreGuiExpandConfig ->
+            dragonCoreGuiExpandConfig.clearFunction()
+        }
+    }
+
+    /**
+     * 给单独玩家添加龙之核心定义的 Function
+     */
+    open fun addFunction(player: Player, dragonCoreGuiFunction: DragonCoreGuiFunctions, function: String) {
+        consumerPlayerDragonCoreGuiExpandConfig(player) { dragonCoreGuiExpandConfig ->
+            dragonCoreGuiExpandConfig.addFunction(dragonCoreGuiFunction, function)
+        }
+    }
+
+    /**
+     * 给单独玩家添加龙之核心定义的 Function
+     */
+    open fun addFunction(player: Player, dragonCoreGuiFunction: DragonCoreGuiFunctions, function: List<String>) {
+        consumerPlayerDragonCoreGuiExpandConfig(player) { dragonCoreGuiExpandConfig ->
+            dragonCoreGuiExpandConfig.addFunction(dragonCoreGuiFunction, function)
+        }
+    }
+
+    /**
+     * 清理玩家所有 CustomFunction
+     */
+    open fun clearCustomFunction(player: Player) {
+        consumerPlayerDragonCoreGuiExpandConfig(player) { dragonCoreGuiExpandConfig ->
+            dragonCoreGuiExpandConfig.clearCustomFunction()
+        }
+    }
+
+    /**
+     * 给单独玩家添加自定义 Function
+     */
+    open fun addCustomFunction(player: Player, functionName: String, functionBody: String) {
+        consumerPlayerDragonCoreGuiExpandConfig(player) { dragonCoreGuiExpandConfig ->
+            dragonCoreGuiExpandConfig.addCustomFunction(functionName, functionBody)
+        }
+    }
+
+    /**
+     * 给单独玩家添加自定义 Function
+     */
+    open fun addCustomFunction(player: Player, functionName: String, functionBody: List<String>) {
+        consumerPlayerDragonCoreGuiExpandConfig(player) { dragonCoreGuiExpandConfig ->
+            dragonCoreGuiExpandConfig.addCustomFunction(functionName, functionBody)
+        }
+    }
+
+    /**
+     * 给单独玩家添加自定义 Function 回调函数
+     */
+    open fun addFunctionCallBack(
+        player: Player, dragonCoreGuiFunction: DragonCoreGuiFunctions, callBack: BiConsumer<String, Player>
+    ) {
+        consumerPlayerDragonCoreGuiExpandConfig(player) { dragonCoreGuiExpandConfig ->
+            dragonCoreGuiExpandConfig.addFunctionCallBack(dragonCoreGuiFunction, callBack)
+        }
+    }
+
+
+    open fun openGui(player: Player) {
         PacketSender.sendYaml(player, "Gui/$fullPath", DragonCoreGuiYaml().also { newYaml ->
+            //从模板配置中读取 Compose 并放入界面
             for (key in baseYamlConfiguration.getKeys(false)) {
                 newYaml[key] = baseYamlConfiguration[key]
             }
@@ -82,62 +187,18 @@ abstract class AbstractDragonCoreGui(
             newYaml["allowEscClose"] = allowEscClose
             newYaml["hideHud"] = hideHud
             newYaml["import"] = import
-            for ((key, value) in customFunctions) {
-                newYaml["Functions.${key}"] = "${
-                    StringBuilder(newYaml.getString("Functions.${key}", "")).also { sb ->
-                        for (s in value) {
-                            if (s.isEmpty()) continue
-                            sb.append(s).append(";\n")
-                        }
-                    }
-                }"
+
+            dragonCoreGuiExpandConfig.handleDragonCoreGuiYaml(fullPath, newYaml)
+
+            consumerPlayerDragonCoreGuiExpandConfig(player) { dragonCoreGuiExpandConfig ->
+                dragonCoreGuiExpandConfig.handleDragonCoreGuiYaml(fullPath, newYaml)
             }
 
-            for ((key, value) in functions) {
-                newYaml["Functions.${key.functionName}"] = "${key.callBackMethod};${
-                    StringBuilder(newYaml.getString("Functions.${key.functionName}", "")).also { sb ->
-                        for (s in value) {
-                            if (s.isEmpty()) continue
-                            sb.append(s).append(";\n")
-                        }
-                    }
-                }".replace(
-                    "%gui_full_path%", fullPath
-                )
-            }
-
-            dragonCoreGuiComposeMap[fullPath]?.let { composeMap ->
-                for ((key, value) in composeMap) {
-                    val convertToConfiguration = value.convertToConfiguration()
-                    for (convertKey in value.convertToConfiguration().getKeys(false)) {
-                        when (convertKey) {
-                            "actions" -> {
-                                val actionsConfig =
-                                    convertToConfiguration.getConfigurationSection("actions") ?: continue
-                                for (actionKey in actionsConfig.getKeys(false)) {
-                                    actionsConfig.set(
-                                        actionKey, actionsConfig.getString(actionKey).replace(
-                                            "%gui_full_path%", fullPath
-                                        )
-                                    )
-                                }
-                                newYaml["$key.actions"] = actionsConfig
-                            }
-
-                            else -> {
-                                newYaml["$key.$convertKey"] = convertToConfiguration.get(convertKey)
-                            }
-                        }
-
-                    }
-                }
-            }
-            if (debug) {
+            debug {
                 newYaml.save(
                     getDebugFile(
                         DragonCoreGui.instance.config.getString("debug.produce-yaml").replace("%gui_key%", fileName)
-                    )
-                        .toFile()
+                    ).toFile()
                 )
             }
         })
@@ -152,91 +213,96 @@ abstract class AbstractDragonCoreGui(
     /**
      * 清空玩家缓存 Yaml 并将龙之核心配置文件夹下的配置全发送过去
      */
-    fun clearCacheYaml(player: Player) {
+    open fun clearCacheYaml(player: Player) {
         Config.sendYamlToClient(player)
     }
 
     /**
      * 关闭 HUD
      */
-    fun closeHUD(player: Player) {
+    open fun closeHUD(player: Player) {
         PacketSender.sendRunFunction(player, fullPath, "方法.关闭界面", false)
     }
 
-    fun getValue(path: String): String {
-        return baseYamlConfiguration.getString(path)
-    }
-
-    fun removePlaceholder(vararg players: Player, key: String) {
+    open fun removePlaceholder(vararg players: Player, key: String) {
         for (player in players) {
             PacketSender.sendDeletePlaceholderCache(player, key, false)
         }
     }
 
-    fun sendPlaceholder(vararg players: Player, data: Map<String, String>) {
+    open fun sendPlaceholder(vararg players: Player, data: Map<String, String>) {
         for (player in players) {
             PacketSender.sendSyncPlaceholder(player, data)
         }
     }
 
     /**
-     * 清理缓存的 Compose
+     * 获取基础配置中的 Value
      */
-    fun clearCompose() {
-        dragonCoreGuiComposeMap[fullPath]?.clear()
-    }
-
-    fun addCompose(compose: AbstractDragonCoreCompose) {
-        dragonCoreGuiComposeMap.computeIfAbsent(fullPath) {
-            mutableMapOf()
-        }[compose.key] = compose
-
+    open fun getValue(path: String): String {
+        return baseYamlConfiguration.getString(path)
     }
 
     /**
-     * 清理缓存的 Function
+     * 清理所有 Compose
      */
-    fun clearFunction() {
-        functions.clear()
-    }
-
-    fun addFunction(dragonCoreGuiFunction: DragonCoreGuiFunctions, function: String) {
-        functions.computeIfAbsent(dragonCoreGuiFunction) {
-            mutableListOf()
-        }.add(function)
-    }
-
-    fun addFunction(dragonCoreGuiFunction: DragonCoreGuiFunctions, function: List<String>) {
-        functions.computeIfAbsent(dragonCoreGuiFunction) {
-            mutableListOf()
-        }.addAll(function)
+    open fun clearCompose() {
+        dragonCoreGuiExpandConfig.clearCompose()
     }
 
     /**
-     * 清理缓存的 CustomFunction
+     * 添加 Compose
      */
-    fun clearCustomFunction() {
-        customFunctions.clear()
+    open fun addCompose(compose: AbstractDragonCoreCompose) {
+        dragonCoreGuiExpandConfig.addCompose(compose)
     }
 
-    fun addCustomFunction(functionName: String, functionBody: String) {
-        customFunctions.computeIfAbsent(functionName) {
-            mutableListOf()
-        }.add(functionBody)
+    /**
+     * 清理所有 Function
+     */
+    open fun clearFunction() {
+        dragonCoreGuiExpandConfig.clearFunction()
     }
 
-    fun addCustomFunction(functionName: String, functionBody: List<String>) {
-        customFunctions.computeIfAbsent(functionName) {
-            mutableListOf()
-        }.addAll(functionBody)
+    /**
+     * 添加龙之核心定义的 Function
+     */
+    open fun addFunction(dragonCoreGuiFunction: DragonCoreGuiFunctions, function: String) {
+        dragonCoreGuiExpandConfig.addFunction(dragonCoreGuiFunction, function)
     }
 
-    fun addFunctionCallBack(dragonCoreGuiFunction: DragonCoreGuiFunctions, callBack: BiConsumer<String, Player>) {
-        dragonCoreGuiFunctionsCallBack.computeIfAbsent(fullPath) {
-            mutableMapOf()
-        }[dragonCoreGuiFunction.functionName] = callBack
-        functions.computeIfAbsent(dragonCoreGuiFunction) {
-            mutableListOf("")
-        }
+    /**
+     * 添加龙之核心定义的 Function
+     */
+    open fun addFunction(dragonCoreGuiFunction: DragonCoreGuiFunctions, function: List<String>) {
+        dragonCoreGuiExpandConfig.addFunction(dragonCoreGuiFunction, function)
+    }
+
+    /**
+     * 清理所有 CustomFunction
+     */
+    open fun clearCustomFunction() {
+        dragonCoreGuiExpandConfig.clearCustomFunction()
+    }
+
+    /**
+     * 添加自定义 Function
+     */
+    open fun addCustomFunction(functionName: String, functionBody: String) {
+        dragonCoreGuiExpandConfig.addCustomFunction(functionName, functionBody)
+    }
+
+    /**
+     * 添加自定义 Function
+     */
+    open fun addCustomFunction(functionName: String, functionBody: List<String>) {
+        dragonCoreGuiExpandConfig.addCustomFunction(functionName, functionBody)
+    }
+
+    /**
+     * 添加自定义 Function 回调函数
+     */
+    open fun addFunctionCallBack(dragonCoreGuiFunction: DragonCoreGuiFunctions, callBack: BiConsumer<String, Player>) {
+        dragonCoreGuiExpandConfig.addFunctionCallBack(dragonCoreGuiFunction, callBack)
     }
 }

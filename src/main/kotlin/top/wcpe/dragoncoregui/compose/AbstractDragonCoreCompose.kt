@@ -4,6 +4,7 @@ import org.bukkit.configuration.MemoryConfiguration
 import org.bukkit.entity.Player
 import top.wcpe.dragoncoregui.yaml.DragonCoreGuiYaml
 import java.util.function.BiConsumer
+import java.util.function.Consumer
 
 /**
  * 由 WCPE 在 2022/7/18 22:24 创建
@@ -40,7 +41,12 @@ abstract class AbstractDragonCoreCompose(
     open var tip: String = "",
 ) {
     private val actionsMap: MutableMap<DragonCoreComposeAction, MutableList<String>> = mutableMapOf()
-    open val actionCallBackMap: MutableMap<String, BiConsumer<List<String>, Player>> = mutableMapOf()
+
+    private val actionCallBackMap: MutableMap<String, BiConsumer<List<String>, Player>> = mutableMapOf()
+    fun consumerActionCallBack(actionKey: String, consumer: Consumer<BiConsumer<List<String>, Player>>) {
+        consumer.accept(actionCallBackMap[actionKey] ?: return)
+    }
+
     private val actionCallBackGetMethodMap: MutableMap<String, List<String>> = mutableMapOf()
 
     private val customKeyValueMap: MutableMap<String, String> = mutableMapOf()
@@ -51,7 +57,7 @@ abstract class AbstractDragonCoreCompose(
      * @param key key
      * @param value value
      */
-    fun addCustomKeyValue(key: String, value: String) {
+    open fun addCustomKeyValue(key: String, value: String) {
         customKeyValueMap[key] = value
     }
 
@@ -61,7 +67,7 @@ abstract class AbstractDragonCoreCompose(
      * @param dragonCoreAction 龙核组件 action 枚举
      * @param action 龙核中的方法
      */
-    fun addAction(dragonCoreAction: DragonCoreComposeAction, action: String) {
+    open fun addAction(dragonCoreAction: DragonCoreComposeAction, action: String) {
         actionsMap.computeIfAbsent(dragonCoreAction) {
             mutableListOf()
         }.add(action)
@@ -74,7 +80,7 @@ abstract class AbstractDragonCoreCompose(
      * @param getValueMethod 龙核中获取值的方法 可在回调函数中返回获取到的值
      * @param callBack 回调函数 数据 to 玩家
      */
-    fun addActionCallBack(
+    open fun addActionCallBack(
         dragonCoreAction: DragonCoreComposeAction,
         getValueMethod: List<String> = listOf(),
         callBack: BiConsumer<List<String>, Player>
@@ -119,8 +125,7 @@ abstract class AbstractDragonCoreCompose(
                 yaml["actions.${key.actionName}"] = "${
                     if (key.enableSendPacker) {
                         "${
-                            key.callBackMethod.replace(
-                                "%get_value_method%",
+                            key.callBackMethod.replace("%get_value_method%",
                                 actionCallBackGetMethodMap[key.actionName].let { getValueMethodList ->
                                     getValueMethodList ?: return@let ""
                                     val f = getValueMethodList.filter { it.isNotEmpty() }
@@ -128,8 +133,7 @@ abstract class AbstractDragonCoreCompose(
                                         return@let ""
                                     }
                                     f.joinToString(prefix = ", ", separator = ", ")
-                                }
-                            )
+                                })
                         };"
                     } else {
                         ""

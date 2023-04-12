@@ -3,6 +3,8 @@ main: top.wcpe.dragoncoregui.DragonCoreGui
 version: "${version}"
 author: "WCPE QQ1837019522"
 website: "https://github.com/wcpe"
+softdepend:
+  - "WcpeLib"
 commands:
   dragoncoregui:
     description: main commands

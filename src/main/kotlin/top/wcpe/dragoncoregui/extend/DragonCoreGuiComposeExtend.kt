@@ -1,5 +1,6 @@
 package top.wcpe.dragoncoregui.extend
 
+import org.bukkit.entity.Player
 import top.wcpe.dragoncoregui.compose.*
 import top.wcpe.dragoncoregui.gui.AbstractDragonCoreGui
 
@@ -13,6 +14,57 @@ import top.wcpe.dragoncoregui.gui.AbstractDragonCoreGui
  * @author : WCPE
  * @since  : v1.0.0
  */
+
+inline fun <T : AbstractDragonCoreGui> T.texture(
+    player: Player,
+    key: String, crossinline runnable: DragonCoreTextureCompose.() -> Unit
+): DragonCoreTextureCompose {
+    return DragonCoreTextureCompose(key).also {
+        runnable(it)
+        addCompose(player, it)
+    }
+}
+
+inline fun <E : AbstractDragonCoreGui> E.entity(
+    player: Player,
+    key: String, crossinline runnable: DragonCoreEntityCompose.() -> Unit
+): DragonCoreEntityCompose {
+    return DragonCoreEntityCompose(key).also {
+        runnable(it)
+        addCompose(player, it)
+    }
+}
+
+inline fun <L : AbstractDragonCoreGui> L.label(
+    player: Player,
+    key: String, crossinline runnable: DragonCoreLabelCompose.() -> Unit
+): DragonCoreLabelCompose {
+    return DragonCoreLabelCompose(key).also {
+        runnable(it)
+        addCompose(player, it)
+    }
+}
+
+inline fun <T : AbstractDragonCoreGui> T.textbox(
+    player: Player,
+    key: String, crossinline runnable: DragonCoreTextBoxCompose.() -> Unit
+): DragonCoreTextBoxCompose {
+    return DragonCoreTextBoxCompose(key).also {
+        runnable(it)
+        addCompose(player, it)
+    }
+}
+
+inline fun <S : AbstractDragonCoreGui> S.slot(
+    player: Player,
+    key: String, crossinline runnable: DragonCoreSlotCompose.() -> Unit
+): DragonCoreSlotCompose {
+    return DragonCoreSlotCompose(key).also {
+        runnable(it)
+        addCompose(player, it)
+    }
+}
+
 inline fun <T : AbstractDragonCoreGui> T.texture(
     key: String, crossinline runnable: DragonCoreTextureCompose.() -> Unit
 ): DragonCoreTextureCompose {

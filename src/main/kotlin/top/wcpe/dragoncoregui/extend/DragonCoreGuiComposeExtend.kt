@@ -15,6 +15,16 @@ import top.wcpe.dragoncoregui.gui.AbstractDragonCoreGui
  * @since  : v1.0.0
  */
 
+inline fun <T : AbstractDragonCoreGui> T.empty(
+    player: Player,
+    key: String, crossinline runnable: DragonCoreEmptyCompose.() -> Unit
+): DragonCoreEmptyCompose {
+    return DragonCoreEmptyCompose(key).also {
+        runnable(it)
+        addCompose(player, it)
+    }
+}
+
 inline fun <T : AbstractDragonCoreGui> T.texture(
     player: Player,
     key: String, crossinline runnable: DragonCoreTextureCompose.() -> Unit
@@ -65,6 +75,14 @@ inline fun <S : AbstractDragonCoreGui> S.slot(
     }
 }
 
+inline fun <T : AbstractDragonCoreGui> T.empty(
+    key: String, crossinline runnable: DragonCoreEmptyCompose.() -> Unit
+): DragonCoreEmptyCompose {
+    return DragonCoreEmptyCompose(key).also {
+        runnable(it)
+        addCompose(it)
+    }
+}
 inline fun <T : AbstractDragonCoreGui> T.texture(
     key: String, crossinline runnable: DragonCoreTextureCompose.() -> Unit
 ): DragonCoreTextureCompose {

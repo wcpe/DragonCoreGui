@@ -244,6 +244,13 @@ abstract class AbstractDragonCoreGui(
     }
 
     /**
+     * 设置基础配置中的 Value
+     */
+    open fun setValue(path: String, any: Any) {
+        return baseYamlConfiguration.set(path, any)
+    }
+
+    /**
      * 清理所有 Compose
      */
     open fun clearCompose() {

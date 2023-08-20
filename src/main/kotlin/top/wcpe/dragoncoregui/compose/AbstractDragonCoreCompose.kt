@@ -122,6 +122,12 @@ abstract class AbstractDragonCoreCompose(
 
 
             for ((key, value) in actionsMap) {
+                val originActions = StringBuilder()
+                for (s in value) {
+                    if (s.isEmpty()) continue
+                    originActions.append(s).append(";\n")
+                }
+
                 yaml["actions.${key.actionName}"] = "${
                     if (key.enableSendPacker) {
                         "${
@@ -138,14 +144,7 @@ abstract class AbstractDragonCoreCompose(
                     } else {
                         ""
                     }
-                }${
-                    StringBuilder(yaml.getString("actions.${key.actionName}", "")).also { sb ->
-                        for (s in value) {
-                            if (s.isEmpty()) continue
-                            sb.append(s).append(";\n")
-                        }
-                    }
-                }".replace(
+                }$originActions".replace(
                     "%compose_key%", this.key
                 )
             }

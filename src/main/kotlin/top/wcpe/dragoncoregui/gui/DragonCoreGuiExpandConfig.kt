@@ -125,41 +125,46 @@ class DragonCoreGuiExpandConfig {
     fun handleDragonCoreGuiYaml(fullPath: String, dragonCoreGuiYaml: DragonCoreGuiYaml) {
         //自定义 function 放进界面
         for ((key, value) in customFunctions) {
-            dragonCoreGuiYaml["Functions.${key}"] = "${
-                StringBuilder(dragonCoreGuiYaml.getString("Functions.${key}", "")).also { sb ->
-                    for (s in value) {
-                        if (s.isEmpty()) continue
-                        sb.append(s).append(";\n")
-                    }
-                }
-            }"
+            val fKey = "Functions.${key}"
+            val stringBuilder = StringBuilder(dragonCoreGuiYaml.getString(fKey, ""))
+            for (s in value) {
+                if (s.isEmpty()) continue
+                stringBuilder.append(s).append(";\n")
+            }
+            dragonCoreGuiYaml[fKey] = stringBuilder.toString()
         }
         //龙核自带 function 放进界面
         for ((key, value) in functions) {
-            dragonCoreGuiYaml["Functions.${key.functionName}"] = "${key.callBackMethod};${
-                StringBuilder(dragonCoreGuiYaml.getString("Functions.${key.functionName}", "")).also { sb ->
-                    for (s in value) {
-                        if (s.isEmpty()) continue
-                        sb.append(s).append(";\n")
-                    }
-                }
-            }".replace(
+            val fKey = "Functions.${key.functionName}"
+            val stringBuilder = StringBuilder(dragonCoreGuiYaml.getString(fKey, ""))
+            for (s in value) {
+                if (s.isEmpty()) continue
+                stringBuilder.append(s).append(";\n")
+            }
+
+            dragonCoreGuiYaml["Functions.${key.functionName}"] = "${stringBuilder}${key.callBackMethod};".replace(
                 "%gui_full_path%", fullPath
             )
         }
         //将代码定义的 Compose 放进界面
         for ((key, value) in dragonCoreGuiComposeMap) {
             val convertToConfiguration = value.convertToConfiguration()
-            for (convertKey in value.convertToConfiguration().getKeys(false)) {
+            for (convertKey in convertToConfiguration.getKeys(false)) {
                 when (convertKey) {
                     "actions" -> {
                         val actionsConfig = convertToConfiguration.getConfigurationSection("actions") ?: continue
+                        val defaultActions = dragonCoreGuiYaml.getConfigurationSection("$key.actions")
+
                         for (actionKey in actionsConfig.getKeys(false)) {
-                            actionsConfig.set(
-                                actionKey, actionsConfig.getString(actionKey).replace(
-                                    "%gui_full_path%", fullPath
-                                )
+                            val default = if (defaultActions != null) {
+                                defaultActions.getString(actionKey, "")
+                            } else {
+                                ""
+                            }
+                            val s = actionsConfig.getString(actionKey, "").replace(
+                                "%gui_full_path%", fullPath
                             )
+                            actionsConfig.set(actionKey, "$default$s")
                         }
                         dragonCoreGuiYaml["$key.actions"] = actionsConfig
                     }

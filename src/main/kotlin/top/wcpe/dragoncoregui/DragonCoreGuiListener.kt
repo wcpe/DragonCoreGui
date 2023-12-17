@@ -25,10 +25,15 @@ class DragonCoreGuiListener : Listener {
 
     private val actionsMap = DragonCoreComposeAction.values().associateBy { it.actionName }
     private val functionsMap = DragonCoreGuiFunctions.values().associateBy { it.functionName }
+    private val packetsMap = mutableMapOf<String, BiConsumer<Player, List<String>>>()
+
+    fun registerPacketHandler(packetIdentifier: String, consumer: BiConsumer<Player, List<String>>) {
+        packetsMap[packetIdentifier] = consumer
+    }
 
     @EventHandler
     fun listenerCustomPacketEvent(e: CustomPacketEvent) {
-        when (e.identifier) {
+        when (val identifier = e.identifier) {
             "DragonCoreGui_actions" -> {
                 if (e.data.size < 3) {
                     return
@@ -76,6 +81,10 @@ class DragonCoreGuiListener : Listener {
                         dragonCoreGuiExpandConfig.consumerFunctionsCallBack(functionKey, consumer)
                     }
                 }
+            }
+
+            else -> {
+                packetsMap[identifier]?.accept(e.player, e.data)
             }
         }
     }

@@ -4,6 +4,7 @@ import eos.moe.dragoncore.config.Config
 import eos.moe.dragoncore.network.PacketSender
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 import top.wcpe.dragoncoregui.DragonCoreGui
 import top.wcpe.dragoncoregui.DragonCoreGui.Companion.debug
 import top.wcpe.dragoncoregui.compose.AbstractDragonCoreCompose
@@ -224,17 +225,33 @@ abstract class AbstractDragonCoreGui(
         PacketSender.sendRunFunction(player, fullPath, "方法.关闭界面", false)
     }
 
+    /**
+     * 移除变量
+     */
     open fun removePlaceholder(vararg players: Player, key: String) {
         for (player in players) {
             PacketSender.sendDeletePlaceholderCache(player, key, false)
         }
     }
 
+    /**
+     * 发送变量
+     */
     open fun sendPlaceholder(vararg players: Player, data: Map<String, String>) {
         for (player in players) {
             PacketSender.sendSyncPlaceholder(player, data)
         }
     }
+
+    /**
+     * 发送客户端格子物品
+     */
+    open fun putClientSlotItem(vararg players: Player, slotIdentity: String, itemStack: ItemStack) {
+        for (player in players) {
+            PacketSender.putClientSlotItem(player, slotIdentity, itemStack)
+        }
+    }
+
 
     /**
      * 获取基础配置中的 Value

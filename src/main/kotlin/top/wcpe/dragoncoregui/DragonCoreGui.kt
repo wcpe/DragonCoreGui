@@ -2,7 +2,9 @@ package top.wcpe.dragoncoregui
 
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
+import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
+import java.util.function.BiConsumer
 import java.util.function.Consumer
 import java.util.logging.Logger
 import kotlin.properties.Delegates
@@ -40,8 +42,8 @@ class DragonCoreGui : JavaPlugin() {
         debug = config.getBoolean("debug.enable")
     }
 
-    override fun reloadConfig() {
-        super.reloadConfig()
+    fun reloadOtherConfig() {
+        reloadConfig()
         loadConst()
     }
 
@@ -49,11 +51,17 @@ class DragonCoreGui : JavaPlugin() {
         instance = this
     }
 
+    private val dragonCoreGuiListener = DragonCoreGuiListener()
+    fun registerPacketHandler(packetIdentifier: String, consumer: BiConsumer<Player, List<String>>) {
+        dragonCoreGuiListener.registerPacketHandler(packetIdentifier, consumer)
+    }
+
     override fun onEnable() {
         saveDefaultConfig()
         loadConst()
         getCommand("dragoncoregui").executor = this
-        server.pluginManager.registerEvents(DragonCoreGuiListener(), this)
+
+        server.pluginManager.registerEvents(dragonCoreGuiListener, this)
     }
 
     override fun onCommand(
@@ -66,7 +74,7 @@ class DragonCoreGui : JavaPlugin() {
             1 -> {
                 when (args[0]) {
                     "reload" -> {
-                        reloadConfig()
+                        reloadOtherConfig()
                         sender.sendMessage("重载配置文件完成")
                         return true
                     }

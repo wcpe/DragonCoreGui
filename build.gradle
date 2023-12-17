@@ -14,7 +14,7 @@ plugins {
 }
 
 group = 'top.wcpe'
-version = '1.1.2'
+version = '1.2.0-SNAPSHOT'
 
 processResources {
     def props = [version: version]
@@ -34,8 +34,7 @@ processResources {
 repositories {
     mavenLocal()
     maven {
-        url "http://maven.wcpe.top/repository/maven-public/"
-        allowInsecureProtocol = true
+        url "https://maven.wcpe.top/repository/maven-public/"
     }
     mavenCentral()
 }
@@ -117,8 +116,8 @@ publishing {
                 username = project.findProperty("username").toString()
                 password = project.findProperty("password").toString()
             }
-            def releasesRepoUrl = "http://maven.wcpe.top/repository/maven-releases/"
-            def snapshotsRepoUrl = "http://maven.wcpe.top/repository/maven-snapshots/"
+            def releasesRepoUrl = "https://maven.wcpe.top/repository/maven-releases/"
+            def snapshotsRepoUrl = "https://maven.wcpe.top/repository/maven-snapshots/"
             url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
         }
     }

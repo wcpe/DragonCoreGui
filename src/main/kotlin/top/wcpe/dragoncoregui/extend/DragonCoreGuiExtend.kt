@@ -1,6 +1,9 @@
 package top.wcpe.dragoncoregui.extend
 
+import org.bukkit.entity.Player
+import top.wcpe.dragoncoregui.DragonCoreGuiApi
 import top.wcpe.dragoncoregui.gui.AbstractDragonCoreGui
+import java.util.function.BiConsumer
 
 /**
  * 由 WCPE 在 2022/7/27 11:43 创建
@@ -18,4 +21,10 @@ inline fun <I> I.dragonCoreGui(
     return object : AbstractDragonCoreGui(path, fileName) {
 
     }.also(runnable)
+}
+
+fun <I> I.dragonCorePacket(
+    packetIdentifier: String, consumer: BiConsumer<Player, List<String>>
+) {
+    DragonCoreGuiApi.registerPacketHandler(packetIdentifier, consumer)
 }

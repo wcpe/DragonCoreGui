@@ -27,28 +27,25 @@ class DragonCoreGui : JavaPlugin() {
             private set
 
         @JvmStatic
-        var debug by Delegates.notNull<Boolean>()
-            private set
-
-        @JvmStatic
         fun debug(consumer: Consumer<Logger>) {
-            if (debug) {
+            if (instance.configuration.debugEnable) {
                 consumer.accept(instance.logger)
             }
         }
     }
 
-    private fun loadConst() {
-        debug = config.getBoolean("debug.enable")
-    }
+    var configuration: Configuration = Configuration(config)
+        private set
 
     fun reloadOtherConfig() {
         reloadConfig()
-        loadConst()
+        configuration = Configuration(config)
     }
 
     override fun onLoad() {
         instance = this
+        saveDefaultConfig()
+        reloadOtherConfig()
     }
 
     private val dragonCoreGuiListener = DragonCoreGuiListener()
@@ -57,10 +54,9 @@ class DragonCoreGui : JavaPlugin() {
     }
 
     override fun onEnable() {
-        saveDefaultConfig()
-        loadConst()
-        getCommand("dragoncoregui").executor = this
-
+        val command = getCommand("dragoncoregui")
+        command.aliases = listOf("dcg")
+        command.executor = this
         server.pluginManager.registerEvents(dragonCoreGuiListener, this)
     }
 

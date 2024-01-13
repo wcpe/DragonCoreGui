@@ -80,7 +80,7 @@ abstract class AbstractDragonCoreGui(
 
     private fun getDebugFile(file: String): Path {
         return DragonCoreGui.instance.dataFolder.toPath().parent.resolve(
-            DragonCoreGui.instance.config.getString("debug.dir")
+            DragonCoreGui.instance.configuration.debugDir
         ).resolve(file)
     }
 
@@ -166,7 +166,7 @@ abstract class AbstractDragonCoreGui(
      * 给单独玩家添加自定义 Function 回调函数
      */
     open fun addFunctionCallBack(
-        player: Player, dragonCoreGuiFunction: DragonCoreGuiFunctions, callBack: BiConsumer<String, Player>
+        player: Player, dragonCoreGuiFunction: DragonCoreGuiFunctions, callBack: BiConsumer<String, Player>,
     ) {
         consumerPlayerDragonCoreGuiExpandConfig(player) { dragonCoreGuiExpandConfig ->
             dragonCoreGuiExpandConfig.addFunctionCallBack(dragonCoreGuiFunction, callBack)
@@ -174,7 +174,7 @@ abstract class AbstractDragonCoreGui(
     }
 
 
-    open fun openGui(player: Player) {
+    open fun sendYaml(player: Player) {
         PacketSender.sendYaml(player, "Gui/$fullPath", DragonCoreGuiYaml().also { newYaml ->
             //从模板配置中读取 Compose 并放入界面
             for (key in baseYamlConfiguration.getKeys(false)) {
@@ -196,13 +196,17 @@ abstract class AbstractDragonCoreGui(
             }
 
             debug {
-                newYaml.save(
-                    getDebugFile(
-                        DragonCoreGui.instance.config.getString("debug.produce-yaml").replace("%gui_key%", fileName)
-                    ).toFile()
-                )
+                val debugProduceYaml = DragonCoreGui.instance.configuration.debugProduceYaml
+                newYaml.save(getDebugFile(debugProduceYaml.replace("%gui_key%", fileName)).toFile())
             }
         })
+    }
+
+    @JvmOverloads
+    open fun openGui(player: Player, sendYaml: Boolean = true) {
+        if (sendYaml) {
+            sendYaml(player)
+        }
         if ("hud".equals(match, true)) {
             PacketSender.sendOpenHud(player, fullPath)
         } else {

@@ -16,15 +16,18 @@ import java.util.function.BiConsumer
  * @since  : v1.0.0
  */
 inline fun <I> I.dragonCoreGui(
-    path: String, fileName: String, crossinline runnable: AbstractDragonCoreGui.() -> Unit
+    path: String, fileName: String, crossinline runnable: AbstractDragonCoreGui.() -> Unit,
 ): AbstractDragonCoreGui {
     return object : AbstractDragonCoreGui(path, fileName) {
 
     }.also(runnable)
 }
 
+@Deprecated("This function is deprecated. Use the PacketManager instead.",
+    ReplaceWith("PacketManager.registerPacket(abstractPacket: AbstractPacket, pluginInstance: Any)")
+)
 fun <I> I.dragonCorePacket(
-    packetIdentifier: String, consumer: BiConsumer<Player, List<String>>
+    packetIdentifier: String, consumer: BiConsumer<Player, List<String>>,
 ) {
     DragonCoreGuiApi.registerPacketHandler(packetIdentifier, consumer)
 }

@@ -17,7 +17,7 @@ import top.wcpe.dragoncoregui.gui.AbstractDragonCoreGui
 
 inline fun <T : AbstractDragonCoreGui> T.empty(
     player: Player,
-    key: String, crossinline runnable: DragonCoreEmptyCompose.() -> Unit
+    key: String, crossinline runnable: DragonCoreEmptyCompose.() -> Unit,
 ): DragonCoreEmptyCompose {
     return DragonCoreEmptyCompose(key).also {
         runnable(it)
@@ -27,7 +27,7 @@ inline fun <T : AbstractDragonCoreGui> T.empty(
 
 inline fun <T : AbstractDragonCoreGui> T.texture(
     player: Player,
-    key: String, crossinline runnable: DragonCoreTextureCompose.() -> Unit
+    key: String, crossinline runnable: DragonCoreTextureCompose.() -> Unit,
 ): DragonCoreTextureCompose {
     return DragonCoreTextureCompose(key).also {
         runnable(it)
@@ -37,7 +37,7 @@ inline fun <T : AbstractDragonCoreGui> T.texture(
 
 inline fun <E : AbstractDragonCoreGui> E.entity(
     player: Player,
-    key: String, crossinline runnable: DragonCoreEntityCompose.() -> Unit
+    key: String, crossinline runnable: DragonCoreEntityCompose.() -> Unit,
 ): DragonCoreEntityCompose {
     return DragonCoreEntityCompose(key).also {
         runnable(it)
@@ -47,7 +47,7 @@ inline fun <E : AbstractDragonCoreGui> E.entity(
 
 inline fun <L : AbstractDragonCoreGui> L.label(
     player: Player,
-    key: String, crossinline runnable: DragonCoreLabelCompose.() -> Unit
+    key: String, crossinline runnable: DragonCoreLabelCompose.() -> Unit,
 ): DragonCoreLabelCompose {
     return DragonCoreLabelCompose(key).also {
         runnable(it)
@@ -57,7 +57,7 @@ inline fun <L : AbstractDragonCoreGui> L.label(
 
 inline fun <T : AbstractDragonCoreGui> T.textbox(
     player: Player,
-    key: String, crossinline runnable: DragonCoreTextBoxCompose.() -> Unit
+    key: String, crossinline runnable: DragonCoreTextBoxCompose.() -> Unit,
 ): DragonCoreTextBoxCompose {
     return DragonCoreTextBoxCompose(key).also {
         runnable(it)
@@ -67,7 +67,7 @@ inline fun <T : AbstractDragonCoreGui> T.textbox(
 
 inline fun <S : AbstractDragonCoreGui> S.slot(
     player: Player,
-    key: String, crossinline runnable: DragonCoreSlotCompose.() -> Unit
+    key: String, crossinline runnable: DragonCoreSlotCompose.() -> Unit,
 ): DragonCoreSlotCompose {
     return DragonCoreSlotCompose(key).also {
         runnable(it)
@@ -76,15 +76,16 @@ inline fun <S : AbstractDragonCoreGui> S.slot(
 }
 
 inline fun <T : AbstractDragonCoreGui> T.empty(
-    key: String, crossinline runnable: DragonCoreEmptyCompose.() -> Unit
+    key: String, crossinline runnable: DragonCoreEmptyCompose.() -> Unit,
 ): DragonCoreEmptyCompose {
     return DragonCoreEmptyCompose(key).also {
         runnable(it)
         addCompose(it)
     }
 }
+
 inline fun <T : AbstractDragonCoreGui> T.texture(
-    key: String, crossinline runnable: DragonCoreTextureCompose.() -> Unit
+    key: String, crossinline runnable: DragonCoreTextureCompose.() -> Unit,
 ): DragonCoreTextureCompose {
     return DragonCoreTextureCompose(key).also {
         runnable(it)
@@ -93,7 +94,7 @@ inline fun <T : AbstractDragonCoreGui> T.texture(
 }
 
 inline fun <E : AbstractDragonCoreGui> E.entity(
-    key: String, crossinline runnable: DragonCoreEntityCompose.() -> Unit
+    key: String, crossinline runnable: DragonCoreEntityCompose.() -> Unit,
 ): DragonCoreEntityCompose {
     return DragonCoreEntityCompose(key).also {
         runnable(it)
@@ -102,7 +103,7 @@ inline fun <E : AbstractDragonCoreGui> E.entity(
 }
 
 inline fun <L : AbstractDragonCoreGui> L.label(
-    key: String, crossinline runnable: DragonCoreLabelCompose.() -> Unit
+    key: String, crossinline runnable: DragonCoreLabelCompose.() -> Unit,
 ): DragonCoreLabelCompose {
     return DragonCoreLabelCompose(key).also {
         runnable(it)
@@ -111,7 +112,7 @@ inline fun <L : AbstractDragonCoreGui> L.label(
 }
 
 inline fun <T : AbstractDragonCoreGui> T.textbox(
-    key: String, crossinline runnable: DragonCoreTextBoxCompose.() -> Unit
+    key: String, crossinline runnable: DragonCoreTextBoxCompose.() -> Unit,
 ): DragonCoreTextBoxCompose {
     return DragonCoreTextBoxCompose(key).also {
         runnable(it)
@@ -120,7 +121,7 @@ inline fun <T : AbstractDragonCoreGui> T.textbox(
 }
 
 inline fun <S : AbstractDragonCoreGui> S.slot(
-    key: String, crossinline runnable: DragonCoreSlotCompose.() -> Unit
+    key: String, crossinline runnable: DragonCoreSlotCompose.() -> Unit,
 ): DragonCoreSlotCompose {
     return DragonCoreSlotCompose(key).also {
         runnable(it)

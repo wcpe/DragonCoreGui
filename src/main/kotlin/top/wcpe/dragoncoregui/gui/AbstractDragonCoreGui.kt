@@ -66,7 +66,7 @@ abstract class AbstractDragonCoreGui(
         this.register()
     }
 
-    private fun register() {
+    fun register() {
         DragonCoreGuiManager.registerDragonCoreGui(this)
     }
 
@@ -80,7 +80,7 @@ abstract class AbstractDragonCoreGui(
 
     private fun getDebugFile(file: String): Path {
         return DragonCoreGui.instance.dataFolder.toPath().parent.resolve(
-            DragonCoreGui.instance.configuration.debugDir
+            DragonCoreGui.instance.configuration?.debugDir ?: ""
         ).resolve(file)
     }
 
@@ -196,7 +196,8 @@ abstract class AbstractDragonCoreGui(
             }
 
             debug {
-                val debugProduceYaml = DragonCoreGui.instance.configuration.debugProduceYaml
+                val configuration = DragonCoreGui.instance.configuration ?: return@debug
+                val debugProduceYaml = configuration.debugProduceYaml
                 newYaml.save(getDebugFile(debugProduceYaml.replace("%gui_key%", fileName)).toFile())
             }
         })
@@ -229,6 +230,14 @@ abstract class AbstractDragonCoreGui(
         PacketSender.sendRunFunction(player, fullPath, "方法.关闭界面", false)
     }
 
+
+    /**
+     * 移除变量
+     */
+    open fun removePlaceholder(player: Player, key: String) {
+        PacketSender.sendDeletePlaceholderCache(player, key, false)
+    }
+
     /**
      * 移除变量
      */
@@ -239,6 +248,17 @@ abstract class AbstractDragonCoreGui(
     }
 
     /**
+     * 发送自定义函数
+     */
+    open fun sendRunFunction(player: Player, function: String) {
+        PacketSender.sendRunFunction(player, fullPath, function, false)
+    }
+
+    open fun sendPlaceholder(player: Player, data: Map<String, String>) {
+        PacketSender.sendSyncPlaceholder(player, data)
+    }
+
+    /**
      * 发送变量
      */
     open fun sendPlaceholder(vararg players: Player, data: Map<String, String>) {
@@ -246,6 +266,22 @@ abstract class AbstractDragonCoreGui(
             PacketSender.sendSyncPlaceholder(player, data)
         }
     }
+
+    /**
+     * 发送异步变量
+     */
+    open fun sendAsyncPlaceholder(player: Player, asyncGet: (Player) -> Map<String, String>) {
+        PacketSender.sendSyncPlaceholder(player, asyncGet(player))
+    }
+
+
+    /**
+     * 发送客户端格子物品
+     */
+    open fun putClientSlotItem(player: Player, slotIdentity: String, itemStack: ItemStack) {
+        PacketSender.putClientSlotItem(player, slotIdentity, itemStack)
+    }
+
 
     /**
      * 发送客户端格子物品

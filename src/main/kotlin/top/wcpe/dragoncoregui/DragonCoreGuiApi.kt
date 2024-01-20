@@ -17,6 +17,9 @@ import java.util.function.BiConsumer
  */
 object DragonCoreGuiApi {
 
+    @Deprecated("This function is deprecated. Use the PacketManager instead.",
+        ReplaceWith("PacketManager.registerPacket(abstractPacket: AbstractPacket, pluginInstance: Any)")
+    )
     fun registerPacketHandler(packetIdentifier: String, consumer: BiConsumer<Player, List<String>>) {
         DragonCoreGui.instance.registerPacketHandler(packetIdentifier, consumer)
     }

@@ -8,6 +8,7 @@ import top.wcpe.dragoncoregui.compose.AbstractDragonCoreCompose
 import top.wcpe.dragoncoregui.compose.DragonCoreComposeAction
 import top.wcpe.dragoncoregui.gui.DragonCoreGuiFunctions
 import top.wcpe.dragoncoregui.gui.DragonCoreGuiManager
+import top.wcpe.dragoncoregui.packet.PacketManager
 import java.util.function.BiConsumer
 import java.util.function.Consumer
 
@@ -27,6 +28,7 @@ class DragonCoreGuiListener : Listener {
     private val functionsMap = DragonCoreGuiFunctions.values().associateBy { it.functionName }
     private val packetsMap = mutableMapOf<String, BiConsumer<Player, List<String>>>()
 
+    @Deprecated("This function is deprecated. Use the PacketManager instead.")
     fun registerPacketHandler(packetIdentifier: String, consumer: BiConsumer<Player, List<String>>) {
         packetsMap[packetIdentifier] = consumer
     }
@@ -85,6 +87,7 @@ class DragonCoreGuiListener : Listener {
 
             else -> {
                 packetsMap[identifier]?.accept(e.player, e.data)
+                PacketManager.handleExecutePacket(identifier, e.player, e.data)
             }
         }
     }

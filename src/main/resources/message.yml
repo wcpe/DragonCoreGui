@@ -1,0 +1,19 @@
+optional-format: "§e[§8%packet_name%§e]"
+required-format: "§e<§6%packet_name%§e>"
+usage-message-format:
+  - '§e使用方式: §b/coregui packets %packet_name% %arguments%'
+  - '%argument_tip%'
+packet-help-top:
+  - '§e===== §6%packet_name% §e发包帮助 §6%page%§e / §6%total_page% §e页 ====='
+  - '§e> §b/coregui packets %packet_name%'
+packet-help-format:
+  - '§e>   %space%§6%packet_name% %arguments%'
+  - '§e>   %space%§a描述: §r%description%'
+packet-help-bottom:
+  - ''
+  - '§e> %argument_tip%'
+  - '§e> §b/coregui packets %packet_name% §6help §8[页] §r来查询其他页'
+
+packet-args-error: "§c发包执行错误 请填写必填参数 %arguments% §c!"
+argument-tip: "§6<> §e为必填参数 §8[] §e为选填参数 选填参数需要使用 §l§7. §e占位"
+packet-not-exist: "§c发包不存在或参数错误! §e请输入§b/coregui packets %packet_name% §6help §8[页码] §e进行查询"

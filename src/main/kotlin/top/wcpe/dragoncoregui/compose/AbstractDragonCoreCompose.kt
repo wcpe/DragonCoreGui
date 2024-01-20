@@ -83,7 +83,7 @@ abstract class AbstractDragonCoreCompose(
     open fun addActionCallBack(
         dragonCoreAction: DragonCoreComposeAction,
         getValueMethod: List<String> = listOf(),
-        callBack: BiConsumer<List<String>, Player>
+        callBack: BiConsumer<List<String>, Player>,
     ) {
         actionCallBackMap[dragonCoreAction.actionName] = callBack
         actionCallBackGetMethodMap[dragonCoreAction.actionName] = getValueMethod

@@ -103,7 +103,7 @@ publishing {
         mavenJava(MavenPublication) {
 
             groupId project.group
-            artifactId project.name
+            artifactId project.name.toLowerCase()
             version project.version
             from components.java
             artifact sourcesJar
@@ -112,7 +112,6 @@ publishing {
     repositories {
         maven {
             credentials {
-                allowInsecureProtocol = true
                 username = project.findProperty("username").toString()
                 password = project.findProperty("password").toString()
             }

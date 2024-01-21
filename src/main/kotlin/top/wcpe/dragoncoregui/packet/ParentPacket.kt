@@ -33,6 +33,10 @@ abstract class ParentPacket @JvmOverloads constructor(
 
     private val childCommandMap: MutableMap<String, ChildPacket> = mutableMapOf()
 
+    fun getChildCommandMap(): Map<String, ChildPacket> {
+        return childCommandMap.toMap()
+    }
+
     fun addChildPacket(childCommand: ChildPacket) {
         childCommandMap[childCommand.name] = childCommand
     }

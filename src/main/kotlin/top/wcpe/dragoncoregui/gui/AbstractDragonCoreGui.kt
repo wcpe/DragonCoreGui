@@ -2,6 +2,7 @@ package top.wcpe.dragoncoregui.gui
 
 import eos.moe.dragoncore.config.Config
 import eos.moe.dragoncore.network.PacketSender
+import org.bukkit.Bukkit
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -234,26 +235,32 @@ abstract class AbstractDragonCoreGui(
     /**
      * 移除变量
      */
-    open fun removePlaceholder(player: Player, key: String) {
-        PacketSender.sendDeletePlaceholderCache(player, key, false)
+    @JvmOverloads
+    open fun removePlaceholder(player: Player, key: String, startWith: Boolean = false) {
+        PacketSender.sendDeletePlaceholderCache(player, key, startWith)
     }
 
     /**
      * 移除变量
      */
-    open fun removePlaceholder(vararg players: Player, key: String) {
+    @JvmOverloads
+    open fun removePlaceholder(vararg players: Player, key: String, startWith: Boolean = false) {
         for (player in players) {
-            PacketSender.sendDeletePlaceholderCache(player, key, false)
+            PacketSender.sendDeletePlaceholderCache(player, key, startWith)
         }
     }
 
     /**
      * 发送自定义函数
      */
-    open fun sendRunFunction(player: Player, function: String) {
-        PacketSender.sendRunFunction(player, fullPath, function, false)
+    @JvmOverloads
+    open fun sendRunFunction(player: Player, function: String, async: Boolean = false) {
+        PacketSender.sendRunFunction(player, fullPath, function, async)
     }
 
+    /**
+     * 发送变量
+     */
     open fun sendPlaceholder(player: Player, data: Map<String, String>) {
         PacketSender.sendSyncPlaceholder(player, data)
     }
@@ -271,7 +278,20 @@ abstract class AbstractDragonCoreGui(
      * 发送异步变量
      */
     open fun sendAsyncPlaceholder(player: Player, asyncGet: (Player) -> Map<String, String>) {
-        PacketSender.sendSyncPlaceholder(player, asyncGet(player))
+        Bukkit.getScheduler().runTaskAsynchronously(DragonCoreGui.instance) {
+            PacketSender.sendSyncPlaceholder(player, asyncGet(player))
+        }
+    }
+
+    /**
+     * 发送异步变量
+     */
+    open fun sendAsyncPlaceholder(vararg players: Player, asyncGet: (Player) -> Map<String, String>) {
+        for (player in players) {
+            Bukkit.getScheduler().runTaskAsynchronously(DragonCoreGui.instance) {
+                PacketSender.sendSyncPlaceholder(player, asyncGet(player))
+            }
+        }
     }
 
 

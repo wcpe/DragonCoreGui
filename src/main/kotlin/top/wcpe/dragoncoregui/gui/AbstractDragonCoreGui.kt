@@ -204,7 +204,10 @@ abstract class AbstractDragonCoreGui(
         })
     }
 
-    @JvmOverloads
+    open fun openGui(player: Player) {
+        openGui(player, true)
+    }
+
     open fun openGui(player: Player, sendYaml: Boolean = true) {
         if (sendYaml) {
             sendYaml(player)

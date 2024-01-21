@@ -7,6 +7,7 @@ import top.wcpe.dragoncoregui.DragonCoreGui
 import top.wcpe.dragoncoregui.packet.annotation.ChildPacket
 import top.wcpe.dragoncoregui.packet.annotation.ParentPacket
 import top.wcpe.dragoncoregui.packet.annotation.SinglePacket
+import top.wcpe.dragoncoregui.packet.annotation.Argument
 import top.wcpe.dragoncoregui.packet.extend.parentPacket
 import top.wcpe.dragoncoregui.packet.extend.singlePacket
 import kotlin.reflect.KClass
@@ -97,7 +98,7 @@ object PacketManager {
         return singlePacket(
             singlePacketAnnotation.name,
             singlePacketAnnotation.description,
-            singlePacketAnnotation.arguments.map { Argument(it.name, it.required, it.description) }.toList(),
+            singlePacketAnnotation.arguments.map { top.wcpe.dragoncoregui.packet.Argument(it.name, it.required, it.description) }.toList(),
             singlePacketAnnotation.usageMessage,
             newInstance as? PacketExecutor,
             newInstance as? TabCompleter
@@ -130,7 +131,7 @@ object PacketManager {
         return parentInstance.childPacket(
             childPacketAnnotation.name,
             childPacketAnnotation.description,
-            childPacketAnnotation.arguments.map { Argument(it.name, it.required, it.description) }.toList(),
+            childPacketAnnotation.arguments.map { top.wcpe.dragoncoregui.packet.Argument(it.name, it.required, it.description) }.toList(),
             childPacketAnnotation.usageMessage,
             childPacketAnnotation.shouldDisplay,
             newInstance as? PacketExecutor,

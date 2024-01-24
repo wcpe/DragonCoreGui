@@ -40,10 +40,85 @@ data class Placeholder(
             }
 
             return Placeholder(
-                key = key,
-                formatKeyMap = formatKeyMap,
-                placeholderMap = placeholderMap
+                key = key, formatKeyMap = formatKeyMap, placeholderMap = placeholderMap
             )
+        }
+    }
+
+    private val docFormat = """
+        ## %key% 变量
+        
+        %format_key_format%
+        
+        %placeholder_format%
+    """.trimIndent()
+
+    private val formatKeyStartFormat = """
+        ## %key% 变量占位符解释 
+        
+        | 占位符 | 描述 |
+        | :--- | :--- |
+    """.trimIndent()
+
+    private val formatKeyFormat = """
+        | %format_name% | %description% |
+    """.trimIndent()
+
+    private val formatKeyFormatStringBuilder = StringBuilder(formatKeyStartFormat.replace("%key%", key))
+
+    fun putFormatKeyToDoc(
+        formatName: String,
+        description: String,
+    ) {
+        val f = formatKeyFormat.replace("%format_name%", formatName).replace("%description%", description)
+        formatKeyFormatStringBuilder.append("\n")
+        formatKeyFormatStringBuilder.append(f)
+    }
+
+    private val placeholderStartFormat = """
+        ## %key% 变量
+        
+        | 变量 | 描述 | 示例返回值 | 
+        | :--- | :--- | :--- |
+    """.trimIndent()
+    private val placeholderFormat = """
+        | %placeholder% | %description% | %example_result_value% |
+    """.trimIndent()
+
+    private val placeholderFormatStringBuilder = StringBuilder(placeholderStartFormat.replace("%key%", key))
+
+
+    fun putPlaceholderToDoc(
+        placeholder: String,
+        description: String,
+        exampleResultValue: String,
+    ) {
+        val f = placeholderFormat.replace("%placeholder%", placeholder).replace("%description%", description)
+            .replace("%example_result_value%", exampleResultValue)
+        placeholderFormatStringBuilder.append("\n")
+        placeholderFormatStringBuilder.append(f)
+    }
+
+    fun toMarkDownDoc(): String {
+        return docFormat.replace("%key%", key).replace("%format_key_format%", formatKeyFormatStringBuilder.toString())
+            .replace("%placeholder_format%", placeholderFormatStringBuilder.toString())
+    }
+
+    private fun replaceKeyFormat(s: String): String {
+        var v = s
+        for ((key, value) in formatKeyMap) {
+            v = v.replace(key, value.name)
+        }
+        return v
+    }
+
+    init {
+        for ((_, value) in formatKeyMap) {
+            putFormatKeyToDoc(value.name, value.description)
+        }
+        for ((_, value) in placeholderMap) {
+            val replaceKeyFormat = replaceKeyFormat(value.format)
+            putPlaceholderToDoc(replaceKeyFormat, value.description, value.exampleResultValue)
         }
     }
 }

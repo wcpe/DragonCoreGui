@@ -52,12 +52,7 @@ abstract class ParentPacket @JvmOverloads constructor(
         tabCompleter: TabCompleter? = null,
     ): ChildPacket {
         return object : ChildPacket(
-            this,
-            name,
-            description,
-            arguments = arguments,
-            usageMessage = usageMessage,
-            shouldDisplay = shouldDisplay
+            this, name, description, arguments = arguments, usageMessage = usageMessage, shouldDisplay = shouldDisplay
         ) {
             init {
                 this.packetExecutor = packetExecutor
@@ -98,9 +93,7 @@ abstract class ParentPacket @JvmOverloads constructor(
         val builder = StringBuilder()
         builder.appendLine(
             Message.PacketHelpTop.toLocalization(
-                "%packet_name%" to name,
-                "%page%" to pageNumber,
-                "%total_page%" to totalPages
+                "%packet_name%" to name, "%page%" to pageNumber, "%total_page%" to totalPages
             )
         )
 

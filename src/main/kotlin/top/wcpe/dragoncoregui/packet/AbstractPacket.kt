@@ -34,6 +34,55 @@ abstract class AbstractPacket(
         return PacketManager.registerPacket(this, instance)
     }
 
+    private val startFormat = """
+        ## %name% 发包
+        
+        | 发包 | 描述 | 
+        | :--- | :--- |
+    """.trimIndent()
+
+    private val markDownDocStringBuilder = StringBuilder(startFormat.replace("%name%", name))
+
+    private val format = """
+        | 方法.发包('%packet_name%'%parameters%) | %description% |
+    """.trimIndent()
+
+    private val parameterFormat = ", '%parameter%'".trimIndent()
+
+    fun getArgumentsString(): String {
+        return arguments.joinToString("") {
+            parameterFormat.replace(
+                "%parameter%",
+                it.description
+            )
+        }
+    }
+
+    fun putPacketToDoc(
+        mainPacketName: String,
+        subPacketName: String,
+        argumentsString: String,
+        description: String,
+    ) {
+        val f = format.replace("%packet_name%", mainPacketName)
+            .replace(
+                "%parameters%", "${
+                    if (subPacketName.isEmpty()) {
+                        ""
+                    } else {
+                        parameterFormat.replace("%parameter%", subPacketName)
+                    }
+                }$argumentsString"
+            )
+            .replace("%description%", description)
+        markDownDocStringBuilder.append("\n")
+        markDownDocStringBuilder.append(f)
+    }
+
+    fun toMarkDownDoc(): String {
+        return markDownDocStringBuilder.toString()
+    }
+
     private fun requiredArgs(
         argsStrings: Array<String?>, arguments: List<Argument>,
     ): List<Argument> {

@@ -37,4 +37,9 @@ abstract class SinglePacket @JvmOverloads constructor(
         arguments = singlePacketBuilder.arguments,
         usageMessage = singlePacketBuilder.usageMessage
     )
+
+    init {
+        putPacketToDoc(name, "", getArgumentsString(), description)
+    }
+
 }

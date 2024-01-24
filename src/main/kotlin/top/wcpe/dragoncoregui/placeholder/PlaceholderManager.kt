@@ -16,7 +16,44 @@ import top.wcpe.dragoncoregui.DragonCoreGui
  * @author : WCPE
  * @since  : v1.4.0-SNAPSHOT
  */
-class PlaceholderManager(private val plugin: JavaPlugin, private val fileName: String = "Placeholders.yml") {
+class PlaceholderManager(val plugin: JavaPlugin, private val fileName: String = "Placeholders.yml") {
+
+    companion object {
+        @JvmStatic
+        private val placeholderMap = mutableMapOf<String, MutableMap<String, PlaceholderManager>>()
+
+        @JvmStatic
+        fun getPlaceholderManagerMap(): Map<String, Map<String, PlaceholderManager>> {
+            return placeholderMap.toMap()
+        }
+
+        @JvmStatic
+        fun getPlaceholderManagerMap(pluginName: String): Map<String, PlaceholderManager> {
+            return placeholderMap.computeIfAbsent(pluginName) {
+                mutableMapOf()
+            }.toMap()
+        }
+
+        @JvmStatic
+        fun register(placeholderManager: PlaceholderManager) {
+            val pluginName = placeholderManager.plugin.name
+            val placeholderManagerMap = placeholderMap.computeIfAbsent(pluginName) {
+                mutableMapOf()
+            }
+            placeholderManagerMap[placeholderManager.fileName] = placeholderManager
+
+            placeholderMap[pluginName] = placeholderManagerMap
+        }
+    }
+
+    init {
+        register(this)
+    }
+
+
+    fun toMarkDownDoc(): String {
+        return placeholderMap.map { it.value.toMarkDownDoc() }.joinToString("\n")
+    }
 
     private val logger = DragonCoreGui.instance.logger
     private val placeholderMap = mutableMapOf<String, Placeholder>()

@@ -8,6 +8,7 @@ import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
 import top.wcpe.dragoncoregui.packet.PacketManager
+import top.wcpe.dragoncoregui.placeholder.PlaceholderManager
 import java.io.File
 import java.util.function.BiConsumer
 import java.util.function.Consumer
@@ -66,6 +67,7 @@ class DragonCoreGui : JavaPlugin() {
     }
 
     private val dragonCoreGuiListener = DragonCoreGuiListener()
+
     @Deprecated("This function is deprecated. Use the PacketManager instead.")
     fun registerPacketHandler(packetIdentifier: String, consumer: BiConsumer<Player, List<String>>) {
         dragonCoreGuiListener.registerPacketHandler(packetIdentifier, consumer)
@@ -91,7 +93,11 @@ class DragonCoreGui : JavaPlugin() {
 
     private fun sendHelper(commandSender: CommandSender) {
         commandSender.sendMessage("/coregui reload 重载插件")
+        commandSender.sendMessage("/coregui packets <发包 identifier> <参数...> 测试发包指令")
+        commandSender.sendMessage("/coregui packetToPlayer <玩家名称> <发包 identifier> <参数...> 测试发包指令")
+        commandSender.sendMessage("/coregui document [packet/placeholder] <插件名称> 生成文档")
     }
+
 
     private fun execute(
         sender: CommandSender,
@@ -130,6 +136,55 @@ class DragonCoreGui : JavaPlugin() {
                     handlerPacket(arg3, playerExact, args, 3)
                     return
                 }
+                if (arg1 == "document") {
+                    if (arg2 == "packet") {
+                        val pluginPacketMap = PacketManager.getPluginPacketMap(arg3)
+                        if (pluginPacketMap.isEmpty()) {
+                            sender.sendMessage("插件: $arg3 未注册发包!")
+                            return
+                        }
+
+                        val resolve = dataFolder.resolve("${arg3}_Packets.yml")
+                        if (!resolve.exists()) {
+                            resolve.createNewFile()
+                        }
+                        val stringBuilder = StringBuilder()
+                        for ((_, value) in pluginPacketMap) {
+                            val toMarkDownDoc = value.first.toMarkDownDoc()
+                            stringBuilder.append(toMarkDownDoc)
+                            stringBuilder.append("\n")
+                            stringBuilder.append("\n")
+                        }
+
+                        resolve.writeText(stringBuilder.toString())
+                        sender.sendMessage("生成 $arg3 PacketDocument 成功! 路径: $resolve")
+                        return
+                    }
+                    if (arg2 == "placeholder") {
+                        val placeholderManagerMap = PlaceholderManager.getPlaceholderManagerMap(arg3)
+                        if (placeholderManagerMap.isEmpty()) {
+                            sender.sendMessage("插件: $arg3 未注册变量!")
+                            return
+                        }
+
+
+                        val resolve = dataFolder.resolve("${arg3}_Placeholders.yml")
+                        if (!resolve.exists()) {
+                            resolve.createNewFile()
+                        }
+                        val stringBuilder = StringBuilder()
+                        for ((_, value) in placeholderManagerMap) {
+                            val toMarkDownDoc = value.toMarkDownDoc()
+                            stringBuilder.append(toMarkDownDoc)
+                            stringBuilder.append("\n")
+                            stringBuilder.append("\n")
+                        }
+
+                        resolve.writeText(stringBuilder.toString())
+                        sender.sendMessage("生成 $arg3 PlaceholderDocument 成功! 路径: $resolve")
+                        return
+                    }
+                }
             }
         }
         sendHelper(sender)
@@ -148,7 +203,9 @@ class DragonCoreGui : JavaPlugin() {
         PacketManager.handleExecutePacket(packetIdentifier, player, argsStrings)
     }
 
-    private val baseTabList = listOf("reload", "packets", "packetToPlayer")
+    private val baseTabList = listOf("reload", "packets", "packetToPlayer", "document")
+
+    private val documentTabList = listOf("packet", "placeholder")
 
     override fun onTabComplete(
         sender: CommandSender,
@@ -163,8 +220,8 @@ class DragonCoreGui : JavaPlugin() {
 
         if (size == 1) {
             return baseTabList.filter {
-                it.startsWith(
-                    args[0]
+                it.lowercase().startsWith(
+                    args[0].lowercase()
                 )
             }
         }
@@ -174,12 +231,27 @@ class DragonCoreGui : JavaPlugin() {
             if (arg1 == "packets") {
                 return if (size == 2) {
                     PacketManager.getPacketMap().keys.filter {
-                        it.startsWith(arg2)
+                        it.lowercase().startsWith(arg2.lowercase())
                     }
                 } else {
                     handlerTabComplete(args[1], sender, args, 2)
                 }
             }
+            if (arg1 == "document") {
+                if (size == 2) {
+                    return documentTabList.filter { it.startsWith(arg2) }
+                } else if (size == 3) {
+                    val arg3 = args[2]
+                    if (arg2 == "packet") {
+                        return PacketManager.getPluginPacketMap()
+                            .filter { it.key.lowercase().startsWith(arg3.lowercase()) }.map { it.key }
+                    } else if (arg2 == "placeholder") {
+                        return PlaceholderManager.getPlaceholderManagerMap()
+                            .filter { it.key.lowercase().startsWith(arg3.lowercase()) }.map { it.key }
+                    }
+                }
+            }
+
             if (arg1 == "packetToPlayer") {
                 return if (size == 2) {
                     if (arg2.isNotEmpty()) {

@@ -31,4 +31,8 @@ abstract class ChildPacket @JvmOverloads constructor(
     description = childCommandBuilder.description,
     arguments = childCommandBuilder.arguments,
     usageMessage = childCommandBuilder.usageMessage,
-)
+) {
+    init {
+        parentPacket.putPacketToDoc(parentPacket.name, name, getArgumentsString(), description)
+    }
+}

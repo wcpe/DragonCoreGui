@@ -54,10 +54,10 @@ data class Placeholder(
     """.trimIndent()
 
     private val formatKeyStartFormat = """
-        ## %key% 变量占位符解释 
+        ### %key% 变量占位符解释 
         
         | 占位符 | 描述 |
-        | :--- | :--- |
+        | :--- | :---: |
     """.trimIndent()
 
     private val formatKeyFormat = """
@@ -76,10 +76,10 @@ data class Placeholder(
     }
 
     private val placeholderStartFormat = """
-        ## %key% 变量
+        ### %key% 变量
         
         | 变量 | 描述 | 示例返回值 | 
-        | :--- | :--- | :--- |
+        | :--- | :---: | :---: |
     """.trimIndent()
     private val placeholderFormat = """
         | %placeholder% | %description% | %example_result_value% |

@@ -144,7 +144,7 @@ class DragonCoreGui : JavaPlugin() {
                             return
                         }
 
-                        val resolve = dataFolder.resolve("${arg3}_Packets.yml")
+                        val resolve = dataFolder.resolve("${arg3}_Packets.md")
                         if (!resolve.exists()) {
                             resolve.createNewFile()
                         }
@@ -168,7 +168,7 @@ class DragonCoreGui : JavaPlugin() {
                         }
 
 
-                        val resolve = dataFolder.resolve("${arg3}_Placeholders.yml")
+                        val resolve = dataFolder.resolve("${arg3}_Placeholders.md")
                         if (!resolve.exists()) {
                             resolve.createNewFile()
                         }

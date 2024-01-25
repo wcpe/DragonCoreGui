@@ -38,7 +38,7 @@ abstract class AbstractPacket(
         ## %name% 发包
         
         | 发包 | 描述 | 
-        | :--- | :--- |
+        | :--- | :---: |
     """.trimIndent()
 
     private val markDownDocStringBuilder = StringBuilder(startFormat.replace("%name%", name))

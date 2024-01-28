@@ -66,7 +66,7 @@ data class Placeholder(
 
     private val formatKeyFormatStringBuilder = StringBuilder(formatKeyStartFormat.replace("%key%", key))
 
-    fun putFormatKeyToDoc(
+    private fun putFormatKeyToDoc(
         formatName: String,
         description: String,
     ) {
@@ -88,7 +88,7 @@ data class Placeholder(
     private val placeholderFormatStringBuilder = StringBuilder(placeholderStartFormat.replace("%key%", key))
 
 
-    fun putPlaceholderToDoc(
+    private fun putPlaceholderToDoc(
         placeholder: String,
         description: String,
         exampleResultValue: String,
@@ -100,8 +100,19 @@ data class Placeholder(
     }
 
     fun toMarkDownDoc(): String {
-        return docFormat.replace("%key%", key).replace("%format_key_format%", formatKeyFormatStringBuilder.toString())
-            .replace("%placeholder_format%", placeholderFormatStringBuilder.toString())
+        return docFormat.replace("%key%", key).replace(
+            "%format_key_format%", if (formatKeyMap.isEmpty()) {
+                ""
+            } else {
+                formatKeyFormatStringBuilder.toString()
+            }
+        ).replace(
+            "%placeholder_format%", if (placeholderMap.isEmpty()) {
+                ""
+            } else {
+                placeholderFormatStringBuilder.toString()
+            }
+        )
     }
 
     private fun replaceKeyFormat(s: String): String {
@@ -117,7 +128,7 @@ data class Placeholder(
             putFormatKeyToDoc(value.name, value.description)
         }
         for ((_, value) in placeholderMap) {
-            val replaceKeyFormat = replaceKeyFormat(value.format)
+            val replaceKeyFormat = "${key}_${replaceKeyFormat(value.format)}"
             putPlaceholderToDoc(replaceKeyFormat, value.description, value.exampleResultValue)
         }
     }

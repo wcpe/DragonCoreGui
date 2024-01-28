@@ -50,6 +50,8 @@ class PlaceholderManager(val plugin: JavaPlugin, private val fileName: String = 
         register(this)
     }
 
+    fun init() = reload()
+
 
     fun toMarkDownDoc(): String {
         return placeholderMap.map { it.value.toMarkDownDoc() }.joinToString("\n")

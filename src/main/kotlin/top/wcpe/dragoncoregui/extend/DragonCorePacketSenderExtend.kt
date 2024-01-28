@@ -49,6 +49,17 @@ fun sendPlaceholder(player: Player, data: Map<String, String>) {
     PacketSender.sendSyncPlaceholder(player, data)
 }
 
+
+/**
+ * 发送变量
+ */
+inline fun sendPlaceholder(player: Player, asyncGet: (player: Player, data: MutableMap<String, String>) -> Unit) {
+    val data = mutableMapOf<String, String>()
+    asyncGet.invoke(player, data)
+    PacketSender.sendSyncPlaceholder(player, data)
+}
+
+
 /**
  * 发送变量
  */
@@ -58,10 +69,25 @@ fun sendPlaceholder(vararg players: Player, data: Map<String, String>) {
     }
 }
 
+
 /**
  * 发送异步变量
  */
-fun sendAsyncPlaceholder(player: Player, asyncGet: (Player) -> Map<String, String>) {
+inline fun sendAsyncPlaceholder(
+    player: Player,
+    crossinline asyncGet: (player: Player, data: MutableMap<String, String>) -> Unit,
+) {
+    val data = mutableMapOf<String, String>()
+    Bukkit.getScheduler().runTaskAsynchronously(DragonCoreGui.instance) {
+        asyncGet.invoke(player, data)
+        PacketSender.sendSyncPlaceholder(player, data)
+    }
+}
+
+/**
+ * 发送异步变量
+ */
+inline fun sendAsyncPlaceholder(player: Player, crossinline asyncGet: (Player) -> Map<String, String>) {
     Bukkit.getScheduler().runTaskAsynchronously(DragonCoreGui.instance) {
         PacketSender.sendSyncPlaceholder(player, asyncGet(player))
     }
@@ -70,7 +96,7 @@ fun sendAsyncPlaceholder(player: Player, asyncGet: (Player) -> Map<String, Strin
 /**
  * 发送异步变量
  */
-fun sendAsyncPlaceholder(vararg players: Player, asyncGet: (Player) -> Map<String, String>) {
+inline fun sendAsyncPlaceholder(vararg players: Player, crossinline asyncGet: (Player) -> Map<String, String>) {
     for (player in players) {
         Bukkit.getScheduler().runTaskAsynchronously(DragonCoreGui.instance) {
             PacketSender.sendSyncPlaceholder(player, asyncGet(player))

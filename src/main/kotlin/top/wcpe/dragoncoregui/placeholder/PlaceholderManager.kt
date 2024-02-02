@@ -1,8 +1,11 @@
 package top.wcpe.dragoncoregui.placeholder
 
+import com.google.common.base.Charsets
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.plugin.java.JavaPlugin
 import top.wcpe.dragoncoregui.DragonCoreGui
+import java.io.InputStream
+import java.io.InputStreamReader
 
 /**
  * 由 WCPE 在 2024/1/20 15:58 创建
@@ -62,14 +65,12 @@ class PlaceholderManager(val plugin: JavaPlugin, private val fileName: String = 
 
     fun reload() {
         placeholderMap.clear()
-        val file = plugin.dataFolder.resolve(fileName)
-        if (!file.exists()) {
-            plugin.saveResource(fileName, false)
-        }
+        val resource = plugin.getResource(fileName) ?: return
 
         logger.info("start load Placeholders...")
         var i = 0
-        val loadConfiguration = YamlConfiguration.loadConfiguration(file)
+        val loadConfiguration = YamlConfiguration.loadConfiguration(InputStreamReader(resource, Charsets.UTF_8))
+
         for (key in loadConfiguration.getKeys(false)) {
             val keySection = loadConfiguration.getConfigurationSection(key) ?: continue
             val load = Placeholder.load(key, keySection)

@@ -1,6 +1,7 @@
 package top.wcpe.dragoncoregui.placeholder
 
 import org.bukkit.configuration.ConfigurationSection
+import top.wcpe.dragoncoregui.DragonCoreGui
 
 /**
  * 由 WCPE 在 2024/1/21 14:28 创建
@@ -32,10 +33,13 @@ data class Placeholder(
             }
             val placeholderMap = mutableMapOf<String, SubPlaceholder>()
             val placeholders = configurationSection.getConfigurationSection("placeholders")
+            var i = 0
             if (placeholders != null) {
                 for (k in placeholders.getKeys(false)) {
                     val keySection = placeholders.getConfigurationSection(k) ?: continue
                     placeholderMap[k] = SubPlaceholder.load(k, keySection)
+                    i++
+                    DragonCoreGui.instance.logger.info("$k load success!")
                 }
             }
 

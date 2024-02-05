@@ -24,11 +24,9 @@ build:
     when: on_success
     paths:
       - build/libs/*.*
-    expire_in: 1 week
-  only:
-    - dev
+    expire_in: 6 mos
   tags:
-    - common
+    - build
 
 publish:
   stage: publish

@@ -53,9 +53,18 @@ fun sendPlaceholder(player: Player, data: Map<String, String>) {
 /**
  * 发送变量
  */
-inline fun sendPlaceholder(player: Player, asyncGet: (player: Player, data: MutableMap<String, String>) -> Unit) {
+inline fun sendPlaceholder(player: Player, syncGet: (player: Player, data: MutableMap<String, String>) -> Unit) {
     val data = mutableMapOf<String, String>()
-    asyncGet.invoke(player, data)
+    syncGet.invoke(player, data)
+    PacketSender.sendSyncPlaceholder(player, data)
+}
+
+/**
+ * 同步发送变量
+ */
+inline fun sendSyncPlaceholder(player: Player, syncGet: (player: Player, data: MutableMap<String, String>) -> Unit) {
+    val data = mutableMapOf<String, String>()
+    syncGet.invoke(player, data)
     PacketSender.sendSyncPlaceholder(player, data)
 }
 

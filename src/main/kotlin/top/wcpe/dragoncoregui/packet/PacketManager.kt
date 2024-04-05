@@ -101,7 +101,7 @@ object PacketManager {
             singlePacketAnnotation.name,
             singlePacketAnnotation.description,
             singlePacketAnnotation.arguments.map {
-                top.wcpe.dragoncoregui.packet.Argument(
+                Argument(
                     it.name,
                     it.required,
                     it.description
@@ -140,7 +140,7 @@ object PacketManager {
             childPacketAnnotation.name,
             childPacketAnnotation.description,
             childPacketAnnotation.arguments.map {
-                top.wcpe.dragoncoregui.packet.Argument(
+                Argument(
                     it.name,
                     it.required,
                     it.description

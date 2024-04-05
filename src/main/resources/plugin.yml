@@ -5,6 +5,8 @@ author: "WCPE QQ1837019522"
 website: "https://github.com/wcpe"
 softdepend:
   - "WcpeLib"
+  - "DragonCore"
+  - "EasyCore"
 commands:
   dragoncoregui:
     description: main commands

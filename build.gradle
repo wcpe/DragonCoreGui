@@ -14,7 +14,7 @@ plugins {
 }
 
 group = 'top.wcpe'
-version = '1.4.2'
+version = '1.4.3-SNAPSHOT'
 
 processResources {
     def props = [version: version]

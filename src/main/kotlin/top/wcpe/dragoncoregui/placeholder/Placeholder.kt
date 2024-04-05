@@ -122,7 +122,7 @@ data class Placeholder(
     private fun replaceKeyFormat(s: String): String {
         var v = s
         for ((key, value) in formatKeyMap) {
-            v = v.replace(key, value.name)
+            v = v.replace("{$key}", "{${value.name}}")
         }
         return v
     }

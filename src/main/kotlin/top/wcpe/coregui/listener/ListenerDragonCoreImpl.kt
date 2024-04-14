@@ -1,40 +1,34 @@
-package top.wcpe.dragoncoregui
+package top.wcpe.coregui.listener
 
 import eos.moe.dragoncore.api.gui.event.CustomPacketEvent
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
-import org.bukkit.event.Listener
+import top.wcpe.dragoncoregui.DragonCoreGui
 import top.wcpe.dragoncoregui.compose.AbstractDragonCoreCompose
-import top.wcpe.dragoncoregui.compose.DragonCoreComposeAction
-import top.wcpe.dragoncoregui.gui.DragonCoreGuiFunctions
 import top.wcpe.dragoncoregui.gui.DragonCoreGuiManager
 import top.wcpe.dragoncoregui.packet.PacketManager
 import java.util.function.BiConsumer
 import java.util.function.Consumer
 
 /**
- * 由 WCPE 在 2022/7/19 1:14 创建
- *
- * Created by WCPE on 2022/7/19 1:14
- *
- * GitHub  : https://github.com/wcpe
+ * 由 WCPE 在 2024/4/9 10:56 创建
+ * <p>
+ * Created by WCPE on 2024/4/9 10:56
+ * <p>
+ * <p>
+ * GitHub  : <a href="https://github.com/wcpe">wcpe 's GitHub</a>
+ * <p>
  * QQ      : 1837019522
  * @author : WCPE
- * @since  : v1.0.0
+ * @since  : v
  */
-class DragonCoreGuiListener : Listener {
-
-    private val actionsMap = DragonCoreComposeAction.values().associateBy { it.actionName }
-    private val functionsMap = DragonCoreGuiFunctions.values().associateBy { it.functionName }
-    private val packetsMap = mutableMapOf<String, BiConsumer<Player, List<String>>>()
-
-    @Deprecated("This function is deprecated. Use the PacketManager instead.")
-    fun registerPacketHandler(packetIdentifier: String, consumer: BiConsumer<Player, List<String>>) {
-        packetsMap[packetIdentifier] = consumer
-    }
+class ListenerDragonCoreImpl : DragonCoreGuiListener() {
 
     @EventHandler
     fun listenerCustomPacketEvent(e: CustomPacketEvent) {
+        DragonCoreGui.debug { logger ->
+            logger.info("[${e.player.name}] Received packet: ${e.identifier} -> ${e.data}")
+        }
         when (val identifier = e.identifier) {
             "DragonCoreGui_actions" -> {
                 if (e.data.size < 3) {

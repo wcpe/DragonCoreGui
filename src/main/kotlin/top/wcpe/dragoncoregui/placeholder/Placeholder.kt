@@ -82,6 +82,10 @@ data class Placeholder(
     private val placeholderStartFormat = """
         ### %key% 变量
         
+        带删除线的变量即为旧版兼容性变量 代表可能未来可能删除
+        
+        请使用未带删除线的变量
+        
         | 变量 | 描述 | 示例返回值 | 
         | :--- | :---: | :---: |
     """.trimIndent()
@@ -89,15 +93,25 @@ data class Placeholder(
         | %placeholder% | %description% | %example_result_value% |
     """.trimIndent()
 
+    private val placeholderOldCompatibleFormat = """
+        | ~~%placeholder%~~ | %description% | %example_result_value% |
+    """.trimIndent()
+
     private val placeholderFormatStringBuilder = StringBuilder(placeholderStartFormat.replace("%key%", key))
 
 
     private fun putPlaceholderToDoc(
+        isOldCompatibleFormat: Boolean,
         placeholder: String,
         description: String,
         exampleResultValue: String,
     ) {
-        val f = placeholderFormat.replace("%placeholder%", placeholder).replace("%description%", description)
+        val format = if (isOldCompatibleFormat) {
+            placeholderOldCompatibleFormat
+        } else {
+            placeholderFormat
+        }
+        val f = format.replace("%placeholder%", placeholder).replace("%description%", description)
             .replace("%example_result_value%", exampleResultValue)
         placeholderFormatStringBuilder.append("\n")
         placeholderFormatStringBuilder.append(f)
@@ -132,8 +146,20 @@ data class Placeholder(
             putFormatKeyToDoc(value.name, value.description)
         }
         for ((_, value) in placeholderMap) {
-            val replaceKeyFormat = "${key}_${replaceKeyFormat(value.format)}"
-            putPlaceholderToDoc(replaceKeyFormat, value.description, value.exampleResultValue)
+            putPlaceholderToDoc(
+                false,
+                "${key}_${replaceKeyFormat(value.format)}",
+                value.description,
+                value.exampleResultValue
+            )
+            if (value.oldCompatibleFormat.isNotEmpty()) {
+                putPlaceholderToDoc(
+                    true,
+                    replaceKeyFormat(value.oldCompatibleFormat),
+                    value.description,
+                    value.exampleResultValue
+                )
+            }
         }
     }
 }

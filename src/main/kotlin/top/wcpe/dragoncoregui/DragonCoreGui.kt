@@ -7,6 +7,12 @@ import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
+import top.wcpe.coregui.listener.DragonCoreGuiListener
+import top.wcpe.coregui.listener.ListenerDragonCoreImpl
+import top.wcpe.coregui.listener.ListenerEasyCoreImpl
+import top.wcpe.coregui.ui.CoreManager
+import top.wcpe.coregui.ui.CoreManagerDragonCoreImpl
+import top.wcpe.coregui.ui.CoreManagerEasyCoreImpl
 import top.wcpe.dragoncoregui.packet.PacketManager
 import top.wcpe.dragoncoregui.placeholder.PlaceholderManager
 import java.io.File
@@ -29,6 +35,10 @@ class DragonCoreGui : JavaPlugin() {
     companion object {
         @JvmStatic
         lateinit var instance: DragonCoreGui
+            private set
+
+        @JvmStatic
+        lateinit var coreManager: CoreManager
             private set
 
         @JvmStatic
@@ -64,9 +74,22 @@ class DragonCoreGui : JavaPlugin() {
         instance = this
         saveDefaultConfig()
         reloadOtherConfig()
+        val dragonCorePlugin = server.pluginManager.getPlugin("DragonCore")
+        val easyCorePlugin = server.pluginManager.getPlugin("EasyCore")
+        coreManager = if (dragonCorePlugin != null) {
+            CoreManagerDragonCoreImpl(dragonCorePlugin)
+        } else if (easyCorePlugin != null) {
+            CoreManagerEasyCoreImpl(easyCorePlugin)
+        } else {
+            logger.info("DragonCore 或 EasyCore 未加载 关闭服务器!")
+            server.shutdown()
+            return
+        }
+        logger.info("coreManager load $coreManager ....")
+
     }
 
-    private val dragonCoreGuiListener = DragonCoreGuiListener()
+    private lateinit var dragonCoreGuiListener: DragonCoreGuiListener
 
     @Deprecated("This function is deprecated. Use the PacketManager instead.")
     fun registerPacketHandler(packetIdentifier: String, consumer: BiConsumer<Player, List<String>>) {
@@ -74,11 +97,24 @@ class DragonCoreGui : JavaPlugin() {
     }
 
     override fun onEnable() {
+
         val command = getCommand("dragoncoregui")
         command.aliases = listOf("dcg", "coregui")
         command.executor = this
         command.tabCompleter = this
+
+        dragonCoreGuiListener = if (server.pluginManager.getPlugin("DragonCore") != null) {
+            ListenerDragonCoreImpl()
+        } else if (server.pluginManager.getPlugin("EasyCore") != null) {
+            ListenerEasyCoreImpl()
+        } else {
+            logger.info("DragonCore 或 EasyCore 未加载 关闭服务器!")
+            server.shutdown()
+            return
+        }
         server.pluginManager.registerEvents(dragonCoreGuiListener, this)
+
+        logger.info("debug -> ${configuration?.debugEnable}")
     }
 
     override fun onCommand(

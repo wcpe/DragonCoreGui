@@ -1,7 +1,5 @@
 package top.wcpe.dragoncoregui.extend
 
-import eos.moe.dragoncore.network.PacketSender
-import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import top.wcpe.dragoncoregui.DragonCoreGui
@@ -23,7 +21,7 @@ import top.wcpe.dragoncoregui.DragonCoreGui
  * 移除变量
  */
 fun removePlaceholder(player: Player, key: String, startWith: Boolean = false) {
-    PacketSender.sendDeletePlaceholderCache(player, key, startWith)
+    DragonCoreGui.coreManager.removePlaceholder(player, key, startWith)
 }
 
 /**
@@ -31,7 +29,7 @@ fun removePlaceholder(player: Player, key: String, startWith: Boolean = false) {
  */
 fun removePlaceholder(vararg players: Player, key: String) {
     for (player in players) {
-        PacketSender.sendDeletePlaceholderCache(player, key, false)
+        DragonCoreGui.coreManager.removePlaceholder(player, key, false)
     }
 }
 
@@ -39,33 +37,29 @@ fun removePlaceholder(vararg players: Player, key: String) {
  * 发送自定义函数
  */
 fun sendRunFunction(player: Player, fullPath: String, function: String, async: Boolean = false) {
-    PacketSender.sendRunFunction(player, fullPath, function, async)
+    DragonCoreGui.coreManager.sendRunFunction(player, fullPath, function, async)
 }
 
 /**
  * 发送变量
  */
 fun sendPlaceholder(player: Player, data: Map<String, String>) {
-    PacketSender.sendSyncPlaceholder(player, data)
+    DragonCoreGui.coreManager.sendPlaceholder(player, data)
 }
 
 
 /**
  * 发送变量
  */
-inline fun sendPlaceholder(player: Player, syncGet: (player: Player, data: MutableMap<String, String>) -> Unit) {
-    val data = mutableMapOf<String, String>()
-    syncGet.invoke(player, data)
-    PacketSender.sendSyncPlaceholder(player, data)
+fun sendPlaceholder(player: Player, syncGet: (player: Player, data: MutableMap<String, String>) -> Unit) {
+    DragonCoreGui.coreManager.sendPlaceholder(player, syncGet)
 }
 
 /**
  * 同步发送变量
  */
-inline fun sendSyncPlaceholder(player: Player, syncGet: (player: Player, data: MutableMap<String, String>) -> Unit) {
-    val data = mutableMapOf<String, String>()
-    syncGet.invoke(player, data)
-    PacketSender.sendSyncPlaceholder(player, data)
+fun sendSyncPlaceholder(player: Player, syncGet: (player: Player, data: MutableMap<String, String>) -> Unit) {
+    DragonCoreGui.coreManager.sendSyncPlaceholder(player, syncGet)
 }
 
 
@@ -74,7 +68,7 @@ inline fun sendSyncPlaceholder(player: Player, syncGet: (player: Player, data: M
  */
 fun sendPlaceholder(vararg players: Player, data: Map<String, String>) {
     for (player in players) {
-        PacketSender.sendSyncPlaceholder(player, data)
+        DragonCoreGui.coreManager.sendPlaceholder(player, data)
     }
 }
 
@@ -82,34 +76,32 @@ fun sendPlaceholder(vararg players: Player, data: Map<String, String>) {
 /**
  * 发送异步变量
  */
-inline fun sendAsyncPlaceholder(
+fun sendAsyncPlaceholder(
     player: Player,
-    crossinline asyncGet: (player: Player, data: MutableMap<String, String>) -> Unit,
+    asyncGet: (player: Player, data: MutableMap<String, String>) -> Unit,
 ) {
-    val data = mutableMapOf<String, String>()
-    Bukkit.getScheduler().runTaskAsynchronously(DragonCoreGui.instance) {
-        asyncGet.invoke(player, data)
-        PacketSender.sendSyncPlaceholder(player, data)
-    }
+    DragonCoreGui.coreManager.sendAsyncPlaceholder(player, asyncGet)
 }
 
 /**
  * 发送异步变量
  */
-inline fun sendAsyncPlaceholder(player: Player, crossinline asyncGet: (Player) -> Map<String, String>) {
-    Bukkit.getScheduler().runTaskAsynchronously(DragonCoreGui.instance) {
-        PacketSender.sendSyncPlaceholder(player, asyncGet(player))
-    }
+@Deprecated(
+    "Use sendAsyncPlaceholder(player, asyncGet)", ReplaceWith(
+        "DragonCoreGui.coreManager.sendAsyncPlaceholder(player, asyncGet)",
+        "top.wcpe.dragoncoregui.DragonCoreGui"
+    )
+)
+fun sendAsyncPlaceholder(player: Player, asyncGet: (Player) -> Map<String, String>) {
+    DragonCoreGui.coreManager.sendAsyncPlaceholder(player, asyncGet)
 }
 
 /**
  * 发送异步变量
  */
-inline fun sendAsyncPlaceholder(vararg players: Player, crossinline asyncGet: (Player) -> Map<String, String>) {
+fun sendAsyncPlaceholder(vararg players: Player, asyncGet: (Player) -> Map<String, String>) {
     for (player in players) {
-        Bukkit.getScheduler().runTaskAsynchronously(DragonCoreGui.instance) {
-            PacketSender.sendSyncPlaceholder(player, asyncGet(player))
-        }
+        DragonCoreGui.coreManager.sendAsyncPlaceholder(player, asyncGet)
     }
 }
 
@@ -117,7 +109,7 @@ inline fun sendAsyncPlaceholder(vararg players: Player, crossinline asyncGet: (P
  * 发送客户端格子物品
  */
 fun putClientSlotItem(player: Player, slotIdentity: String, itemStack: ItemStack) {
-    PacketSender.putClientSlotItem(player, slotIdentity, itemStack)
+    DragonCoreGui.coreManager.putClientSlotItem(player, slotIdentity, itemStack)
 }
 
 
@@ -126,6 +118,6 @@ fun putClientSlotItem(player: Player, slotIdentity: String, itemStack: ItemStack
  */
 fun putClientSlotItem(vararg players: Player, slotIdentity: String, itemStack: ItemStack) {
     for (player in players) {
-        PacketSender.putClientSlotItem(player, slotIdentity, itemStack)
+        DragonCoreGui.coreManager.putClientSlotItem(player, slotIdentity, itemStack)
     }
 }

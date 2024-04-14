@@ -16,6 +16,7 @@ import org.bukkit.configuration.ConfigurationSection
  */
 data class SubPlaceholder(
     val key: String,
+    val oldCompatibleFormat: String,
     val format: String,
     val description: String,
     val exampleResultValue: String,
@@ -24,12 +25,14 @@ data class SubPlaceholder(
     companion object {
         @JvmStatic
         fun load(key: String, configurationSection: ConfigurationSection): SubPlaceholder {
+            val oldCompatibleFormat = configurationSection.getString("old-compatible-format", "")
             val format = configurationSection.getString("format", "")
             val description = configurationSection.getString("description", "")
             val exampleResultValue = configurationSection.getString("example-result-value", "")
 
             return SubPlaceholder(
                 key = key,
+                oldCompatibleFormat = oldCompatibleFormat,
                 format = format,
                 description = description,
                 exampleResultValue = exampleResultValue

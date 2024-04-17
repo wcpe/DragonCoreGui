@@ -4,6 +4,7 @@ import com.yuankong.easycore.api.EasyCoreAPI
 import com.yuankong.easycore.api.ui.SlotAPI
 import com.yuankong.easycore.api.ui.UiConfig
 import com.yuankong.easycore.config.Config
+import com.yuankong.easycore.packet.PacketUtil
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -34,6 +35,9 @@ class CoreManagerEasyCoreImpl(private val easyCorePlugin: Plugin) : CoreManager 
 
     override fun reloadCoreConfig() {
         Config.loadConfig()
+        for (onlinePlayer in Bukkit.getOnlinePlayers()) {
+            PacketUtil.sendAllGui(onlinePlayer, true)
+        }
     }
 
     /**

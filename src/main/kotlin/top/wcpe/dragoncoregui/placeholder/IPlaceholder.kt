@@ -14,7 +14,7 @@ import kotlin.math.log
  * <p>
  * QQ      : 1837019522
  * @author : WCPE
- * @since  : v
+ * @since  : v2.0.0-SNAPSHOT
  */
 interface IPlaceholder {
     val placeholderManager: PlaceholderManager

@@ -20,7 +20,7 @@ import java.util.function.Consumer
  * <p>
  * QQ      : 1837019522
  * @author : WCPE
- * @since  : v
+ * @since  : v2.0.0-SNAPSHOT
  */
 class ListenerDragonCoreImpl : DragonCoreGuiListener() {
 

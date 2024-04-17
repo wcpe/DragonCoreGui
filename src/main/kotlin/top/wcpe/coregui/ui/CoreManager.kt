@@ -14,7 +14,7 @@ import top.wcpe.coregui.gui.AbstractGui
  * <p>
  * QQ      : 1837019522
  * @author : WCPE
- * @since  : v
+ * @since  : v2.0.0-SNAPSHOT
  */
 interface CoreManager {
     fun moveConfig(abstractGui: AbstractGui)

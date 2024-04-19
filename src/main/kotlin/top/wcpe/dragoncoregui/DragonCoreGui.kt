@@ -76,15 +76,19 @@ class DragonCoreGui : JavaPlugin() {
         reloadOtherConfig()
         val dragonCorePlugin = server.pluginManager.getPlugin("DragonCore")
         val easyCorePlugin = server.pluginManager.getPlugin("EasyCore")
-        coreManager = if (dragonCorePlugin != null) {
-            CoreManagerDragonCoreImpl(dragonCorePlugin)
+
+        if (dragonCorePlugin != null) {
+            coreManager = CoreManagerDragonCoreImpl(dragonCorePlugin)
+            dragonCoreGuiListener = ListenerDragonCoreImpl()
         } else if (easyCorePlugin != null) {
-            CoreManagerEasyCoreImpl(easyCorePlugin)
+            coreManager = CoreManagerEasyCoreImpl(easyCorePlugin)
+            dragonCoreGuiListener = ListenerEasyCoreImpl()
         } else {
             logger.info("DragonCore 或 EasyCore 未加载 关闭服务器!")
             server.shutdown()
             return
         }
+
         logger.info("coreManager load $coreManager ....")
 
     }
@@ -103,15 +107,7 @@ class DragonCoreGui : JavaPlugin() {
         command.executor = this
         command.tabCompleter = this
 
-        dragonCoreGuiListener = if (server.pluginManager.getPlugin("DragonCore") != null) {
-            ListenerDragonCoreImpl()
-        } else if (server.pluginManager.getPlugin("EasyCore") != null) {
-            ListenerEasyCoreImpl()
-        } else {
-            logger.info("DragonCore 或 EasyCore 未加载 关闭服务器!")
-            server.shutdown()
-            return
-        }
+
         server.pluginManager.registerEvents(dragonCoreGuiListener, this)
 
         logger.info("debug -> ${configuration?.debugEnable}")

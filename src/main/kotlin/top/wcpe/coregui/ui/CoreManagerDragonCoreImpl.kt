@@ -24,6 +24,9 @@ import java.io.File
  * @since  : v2.0.0-SNAPSHOT
  */
 class CoreManagerDragonCoreImpl(private val dragonCorePlugin: Plugin) : CoreManager {
+    override fun getCoreName(): String {
+        return "DragonCore"
+    }
 
     override fun moveConfig(abstractGui: AbstractGui) {
         val guiDirFile = File(dragonCorePlugin.dataFolder, "Gui")

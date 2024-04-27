@@ -17,6 +17,9 @@ import top.wcpe.coregui.gui.AbstractGui
  * @since  : v2.0.0-SNAPSHOT
  */
 interface CoreManager {
+
+    fun getCoreName(): String
+
     fun moveConfig(abstractGui: AbstractGui)
 
     fun reloadCoreConfig()

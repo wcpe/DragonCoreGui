@@ -24,12 +24,18 @@ import java.io.File
  * @since  : v2.0.0-SNAPSHOT
  */
 class CoreManagerDragonCoreImpl(private val dragonCorePlugin: Plugin) : CoreManager {
+
+    private val guiDirFile = File(dragonCorePlugin.dataFolder, "Gui")
+
+    override fun getGuiDirFile(): File {
+        return guiDirFile
+    }
+
     override fun getCoreName(): String {
         return "DragonCore"
     }
 
     override fun moveConfig(abstractGui: AbstractGui) {
-        val guiDirFile = File(dragonCorePlugin.dataFolder, "Gui")
         val f = File(guiDirFile, "${abstractGui.fullPath}.yml")
         abstractGui.yamlConfiguration.save(f)
     }

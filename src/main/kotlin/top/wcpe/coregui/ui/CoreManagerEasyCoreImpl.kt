@@ -26,12 +26,18 @@ import java.io.File
  * @since  : v2.0.0-SNAPSHOT
  */
 class CoreManagerEasyCoreImpl(private val easyCorePlugin: Plugin) : CoreManager {
+
+    private val guiDirFile = File(easyCorePlugin.dataFolder, "gui")
+
+    override fun getGuiDirFile(): File {
+        return guiDirFile
+    }
+
     override fun getCoreName(): String {
         return "EasyCore"
     }
 
     override fun moveConfig(abstractGui: AbstractGui) {
-        val guiDirFile = File(easyCorePlugin.dataFolder, "gui")
         val f = File(guiDirFile, "${abstractGui.fullPath}.yml")
         abstractGui.yamlConfiguration.save(f)
     }

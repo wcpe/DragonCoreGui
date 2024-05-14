@@ -125,11 +125,20 @@ class DragonCoreGui : JavaPlugin() {
 
     private fun sendHelper(commandSender: CommandSender) {
         commandSender.sendMessage("/coregui reload 重载插件")
+        commandSender.sendMessage("/coregui openGui <玩家名称> <界面名称>")
+        commandSender.sendMessage("/coregui document [packet/placeholder] <插件名称> 生成文档")
         commandSender.sendMessage("/coregui packets <发包 identifier> <参数...> 测试发包指令")
         commandSender.sendMessage("/coregui packetToPlayer <玩家名称> <发包 identifier> <参数...> 测试发包指令")
-        commandSender.sendMessage("/coregui document [packet/placeholder] <插件名称> 生成文档")
     }
 
+    fun getPlayer(sender: CommandSender, playerName: String): Player? {
+        val playerExact = Bukkit.getPlayerExact(playerName)
+        if (playerExact == null || !playerExact.isOnline) {
+            sender.sendMessage("玩家 $playerName 不存在或不在线!")
+            return null
+        }
+        return playerExact
+    }
 
     private fun execute(
         sender: CommandSender,
@@ -160,13 +169,13 @@ class DragonCoreGui : JavaPlugin() {
             if (size > 2) {
                 val arg3 = args[2]
                 if (arg1 == "packetToPlayer") {
-                    val playerExact = Bukkit.getPlayerExact(arg2)
-                    if (playerExact == null || !playerExact.isOnline) {
-                        sender.sendMessage("玩家 $arg2 不存在或不在线!")
-                        return
-                    }
+                    val playerExact = getPlayer(sender, arg2) ?: return
                     handlerPacket(arg3, playerExact, args, 3)
                     return
+                }
+                if (arg1 == "openGui") {
+                    val playerExact = getPlayer(sender, arg2) ?: return
+                    coreManager.openGui(playerExact, arg3)
                 }
                 if (arg1 == "document") {
                     if (arg2 == "packet") {
@@ -235,7 +244,7 @@ class DragonCoreGui : JavaPlugin() {
         PacketManager.handleExecutePacket(packetIdentifier, player, argsStrings)
     }
 
-    private val baseTabList = listOf("reload", "packets", "packetToPlayer", "document")
+    private val baseTabList = listOf("reload", "openGui", "packets", "packetToPlayer", "document")
 
     private val documentTabList = listOf("packet", "placeholder")
 
@@ -286,23 +295,37 @@ class DragonCoreGui : JavaPlugin() {
 
             if (arg1 == "packetToPlayer") {
                 return if (size == 2) {
-                    if (arg2.isNotEmpty()) {
-                        Bukkit.getOnlinePlayers().filter { it.name.startsWith(arg2) }.map { it.name }
-                    } else {
-                        Bukkit.getOnlinePlayers().map { it.name }
-                    }
-                } else if (size == 3) {
-                    PacketManager.getPacketMap().keys.filter {
-                        it.startsWith(args[2])
-                    }
+                    players(arg2)
                 } else {
-                    handlerTabComplete(args[2], sender, args, 3)
+                    if (size == 3) {
+                        PacketManager.getPacketMap().keys.filter {
+                            it.startsWith(args[2])
+                        }
+                    } else {
+                        handlerTabComplete(args[2], sender, args, 3)
+                    }
                 }
             }
-
+            if (arg1 == "openGui") {
+                if (size == 2) {
+                    return players(arg2)
+                } else if (size == 3) {
+                    return coreManager.getGuiList().filter {
+                        it.startsWith(args[2])
+                    }
+                }
+            }
         }
 
         return emptyList()
+    }
+
+    private fun players(arg: String): List<String> {
+        return if (arg.isNotEmpty()) {
+            Bukkit.getOnlinePlayers().filter { it.name.startsWith(arg) }.map { it.name }
+        } else {
+            Bukkit.getOnlinePlayers().map { it.name }
+        }
     }
 
     private fun handlerTabComplete(

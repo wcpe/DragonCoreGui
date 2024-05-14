@@ -3,6 +3,7 @@ package top.wcpe.coregui.ui
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import top.wcpe.coregui.gui.AbstractGui
+import java.io.File
 
 /**
  * 由 WCPE 在 2024/4/5 16:18 创建
@@ -17,6 +18,30 @@ import top.wcpe.coregui.gui.AbstractGui
  * @since  : v2.0.0-SNAPSHOT
  */
 interface CoreManager {
+
+    fun getGuiDirFile(): File
+
+    fun getGuiList(): List<String> {
+
+        val guiDirFile = getGuiDirFile()
+        return guiDirFile.walk().filter { it.isFile }.mapNotNull { file ->
+
+            val filePath = file.path
+            val fullPath = filePath.replace("${guiDirFile}${File.separatorChar}", "")
+
+            // 查找最后一个点的位置，即扩展名的起始位置
+            val lastDotIndex = fullPath.lastIndexOf('.')
+
+            // 如果找到了点，并且点不在文件名的开头位置
+            if (lastDotIndex == -1 || lastDotIndex <= fullPath.lastIndexOf(File.separatorChar)) {
+                return@mapNotNull null
+            }
+            val fullPathWithoutExtension = fullPath.substring(0, lastDotIndex)
+
+            return@mapNotNull fullPathWithoutExtension
+        }.toList()
+    }
+
 
     fun getCoreName(): String
 

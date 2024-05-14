@@ -1,6 +1,7 @@
 package top.wcpe.coregui.listener
 
 import eos.moe.dragoncore.api.gui.event.CustomPacketEvent
+import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import top.wcpe.dragoncoregui.DragonCoreGui
@@ -84,5 +85,6 @@ class ListenerDragonCoreImpl : DragonCoreGuiListener() {
                 PacketManager.handleExecutePacket(identifier, e.player, e.data)
             }
         }
+        Bukkit.getPluginManager().callEvent(top.wcpe.coregui.event.CustomPacketEvent(e.player, e.identifier, e.data))
     }
 }

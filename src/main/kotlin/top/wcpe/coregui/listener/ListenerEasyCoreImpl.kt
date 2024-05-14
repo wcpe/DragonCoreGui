@@ -1,6 +1,7 @@
 package top.wcpe.coregui.listener
 
 import com.yuankong.easycore.api.event.CustomPacketEvent
+import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import top.wcpe.dragoncoregui.DragonCoreGui
 import top.wcpe.dragoncoregui.packet.PacketManager
@@ -27,6 +28,7 @@ class ListenerEasyCoreImpl : DragonCoreGuiListener() {
         val identifier = e.identifier
         packetsMap[identifier]?.accept(e.player, e.data)
         PacketManager.handleExecutePacket(identifier, e.player, e.data)
+        Bukkit.getPluginManager().callEvent(top.wcpe.coregui.event.CustomPacketEvent(e.player, identifier, e.data))
     }
 
 }

@@ -18,7 +18,7 @@ import org.bukkit.event.player.PlayerEvent
  * @since  : v2.0.0-SNAPSHOT
  */
 data class CustomPacketEvent(
-    val player: Player,
+    private val player: Player,
     val identifier: String,
     val data: List<String>,
 ) : PlayerEvent(player), Cancellable {

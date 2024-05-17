@@ -1,6 +1,8 @@
 package top.wcpe.coregui.ui
 
 import eos.moe.dragoncore.DragonCore
+import eos.moe.dragoncore.api.CoreAPI
+import eos.moe.dragoncore.api.SlotAPI
 import eos.moe.dragoncore.config.Config
 import eos.moe.dragoncore.network.PacketSender
 import org.bukkit.Bukkit
@@ -89,6 +91,10 @@ class CoreManagerDragonCoreImpl(private val dragonCorePlugin: Plugin) : CoreMana
         PacketSender.sendSyncPlaceholder(player, data)
     }
 
+    override fun sendPlaceholderMap(player: Player, data: Map<String, String>) {
+        PacketSender.sendSyncPlaceholder(player, data)
+    }
+
     /**
      * 同步发送变量
      */
@@ -146,6 +152,14 @@ class CoreManagerDragonCoreImpl(private val dragonCorePlugin: Plugin) : CoreMana
 
     override fun closeGui(player: Player, fullPath: String) {
         PacketSender.sendRunFunction(player, fullPath, "方法.关闭界面", false)
+    }
+
+    override fun registerKey(key: String) {
+        CoreAPI.registerKey("")
+    }
+
+    override fun getCacheSlotItem(player: Player, identifier: String): ItemStack? {
+        return SlotAPI.getCacheSlotItem(player, identifier)
     }
 
 }

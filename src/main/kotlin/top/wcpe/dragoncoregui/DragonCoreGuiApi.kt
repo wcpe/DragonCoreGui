@@ -23,4 +23,6 @@ object DragonCoreGuiApi {
     fun registerPacketHandler(packetIdentifier: String, consumer: BiConsumer<Player, List<String>>) {
         DragonCoreGui.instance.registerPacketHandler(packetIdentifier, consumer)
     }
+
+
 }

@@ -42,8 +42,12 @@ interface CoreManager {
         }.toList()
     }
 
-
     fun getCoreName(): String
+
+    fun moveConfig(fullPath: String, file: File) {
+        val f = File(getGuiDirFile(), fullPath + file.name)
+        file.copyTo(f, true)
+    }
 
     fun moveConfig(abstractGui: AbstractGui)
 
@@ -68,6 +72,11 @@ interface CoreManager {
      * 发送变量
      */
     fun sendPlaceholder(player: Player, data: Map<String, String>)
+
+    /**
+     * 发送变量
+     */
+    fun sendPlaceholderMap(player: Player, data: Map<String, String>)
 
 
     /**
@@ -109,4 +118,10 @@ interface CoreManager {
     fun openGui(player: Player, fullPath: String)
 
     fun closeGui(player: Player, fullPath: String)
+
+    fun registerKey(key: String)
+
+    fun getCacheSlotItem(player: Player, identifier: String): ItemStack?
+
+
 }

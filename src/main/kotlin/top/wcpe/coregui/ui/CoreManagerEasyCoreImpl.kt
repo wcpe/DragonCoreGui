@@ -95,6 +95,10 @@ class CoreManagerEasyCoreImpl(private val easyCorePlugin: Plugin) : CoreManager 
         EasyCoreAPI.sendPlaceholder(player, data.toMap())
     }
 
+    override fun sendPlaceholderMap(player: Player, data: Map<String, String>) {
+        EasyCoreAPI.sendPlaceholder(player, data)
+    }
+
     /**
      * 同步发送变量
      */
@@ -154,6 +158,14 @@ class CoreManagerEasyCoreImpl(private val easyCorePlugin: Plugin) : CoreManager 
 
     override fun closeGui(player: Player, fullPath: String) {
         EasyCoreAPI.closeGui(player)
+    }
+
+    override fun registerKey(key: String) {
+
+    }
+
+    override fun getCacheSlotItem(player: Player, identifier: String): ItemStack? {
+        return SlotAPI.getExtraSlotItem(player, identifier)
     }
 
 }

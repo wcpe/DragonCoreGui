@@ -146,16 +146,40 @@ data class Placeholder(
             putFormatKeyToDoc(value.name, value.description)
         }
         for ((_, value) in placeholderMap) {
-            putPlaceholderToDoc(
-                false,
-                "${key}_${replaceKeyFormat(value.format)}",
-                value.description,
-                value.exampleResultValue
-            )
+            if (value.format.isNotEmpty()) {
+                putPlaceholderToDoc(
+                    false,
+                    "${key}_${replaceKeyFormat(value.format)}",
+                    value.description,
+                    value.exampleResultValue
+                )
+            }
+            for (format in value.formats) {
+                if (format.isEmpty()) {
+                    continue
+                }
+                putPlaceholderToDoc(
+                    false,
+                    "${key}_${replaceKeyFormat(format)}",
+                    value.description,
+                    value.exampleResultValue
+                )
+            }
             if (value.oldCompatibleFormat.isNotEmpty()) {
                 putPlaceholderToDoc(
                     true,
                     replaceKeyFormat(value.oldCompatibleFormat),
+                    value.description,
+                    value.exampleResultValue
+                )
+            }
+            for (format in value.oldCompatibleFormats) {
+                if (format.isEmpty()) {
+                    continue
+                }
+                putPlaceholderToDoc(
+                    true,
+                    replaceKeyFormat(format),
                     value.description,
                     value.exampleResultValue
                 )

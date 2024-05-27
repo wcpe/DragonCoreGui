@@ -33,57 +33,72 @@ interface IPlaceholder {
         args: Array<Pair<String, String>>,
         value: String,
     ) {
-        data[format(args, true)] = value
-        for (format in formats(args, true)) {
-            data[format] = value
-        }
-        data[oldCompatibleFormat(args)] = value
-        for (format in oldCompatibleFormats(args)) {
+        consumerFormat(args) { format ->
             data[format] = value
         }
     }
 
     fun putData(data: MutableMap<String, String>, value: String) {
-        data[format(emptyArray(), true)] = value
-        for (format in formats(emptyArray(), true)) {
-            data[format] = value
-        }
-        data[oldCompatibleFormat(emptyArray())] = value
-        for (format in oldCompatibleFormats(emptyArray())) {
+        consumerFormat(arrayOf()) { format ->
             data[format] = value
         }
     }
 
     fun sendPlaceholder(player: Player, value: String) {
         val data = mutableMapOf<String, String>()
-
-        data[format(emptyArray(), true)] = value
-        for (format in formats(emptyArray(), true)) {
-            data[format] = value
-        }
-        data[oldCompatibleFormat(emptyArray())] = value
-        for (format in oldCompatibleFormats(emptyArray())) {
+        consumerFormat(player, arrayOf()) { _, format ->
             data[format] = value
         }
         top.wcpe.dragoncoregui.extend.sendPlaceholder(
             player.player, data
         )
-
     }
 
     fun sendPlaceholder(player: Player, args: Array<Pair<String, String>>, value: String) {
         val data = mutableMapOf<String, String>()
-        data[format(args, true)] = value
-        for (format in formats(args, true)) {
-            data[format] = value
-        }
-        data[oldCompatibleFormat(args)] = value
-        for (format in oldCompatibleFormats(args)) {
+        consumerFormat(player, args) { _, format ->
             data[format] = value
         }
         top.wcpe.dragoncoregui.extend.sendPlaceholder(
             player.player, data
         )
+    }
+
+    private fun consumerSingleFormat(
+        format: String,
+        consumer: (format: String) -> Unit,
+    ) {
+        if (format.isEmpty()) {
+            return
+        }
+        consumer(format)
+    }
+
+    fun consumerFormat(
+        args: Array<Pair<String, String>>,
+        consumer: (format: String) -> Unit,
+    ) {
+        val format = format(args, true)
+        consumerSingleFormat(format, consumer)
+        val oldFormat = oldCompatibleFormat(args)
+        consumerSingleFormat(oldFormat, consumer)
+        for (f in formats(args, true)) {
+            consumerSingleFormat(f, consumer)
+        }
+        for (f in oldCompatibleFormats(args)) {
+            consumerSingleFormat(f, consumer)
+        }
+    }
+
+    private fun consumerSingleFormat(
+        player: Player,
+        format: String,
+        consumer: (player: Player, format: String) -> Unit,
+    ) {
+        if (format.isEmpty()) {
+            return
+        }
+        consumer(player, format)
     }
 
     fun consumerFormat(
@@ -92,14 +107,14 @@ interface IPlaceholder {
         consumer: (player: Player, format: String) -> Unit,
     ) {
         val format = format(args, true)
+        consumerSingleFormat(player, format, consumer)
         val oldFormat = oldCompatibleFormat(args)
-        consumer(player, format)
+        consumerSingleFormat(player, oldFormat, consumer)
         for (f in formats(args, true)) {
-            consumer(player, f)
+            consumerSingleFormat(player, f, consumer)
         }
-        consumer(player, oldFormat)
         for (f in oldCompatibleFormats(args)) {
-            consumer(player, f)
+            consumerSingleFormat(player, f, consumer)
         }
     }
 
@@ -134,7 +149,7 @@ interface IPlaceholder {
             }
             return listOf()
         }
-        return subPlaceholder.oldCompatibleFormats.map { format(it, args, false) }
+        return subPlaceholder.oldCompatibleFormats.filter { it.isEmpty() }.map { format(it, args, false) }
     }
 
     fun format(args: Array<Pair<String, String>>, hasPrefix: Boolean = true): String {
@@ -157,6 +172,6 @@ interface IPlaceholder {
             return listOf()
         }
 
-        return subPlaceholder.formats.map { format(it, args) }
+        return subPlaceholder.formats.filter { it.isEmpty() }.map { format(it, args) }
     }
 }

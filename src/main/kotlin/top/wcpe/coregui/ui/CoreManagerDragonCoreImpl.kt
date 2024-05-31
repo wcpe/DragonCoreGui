@@ -4,14 +4,17 @@ import eos.moe.dragoncore.DragonCore
 import eos.moe.dragoncore.api.CoreAPI
 import eos.moe.dragoncore.api.SlotAPI
 import eos.moe.dragoncore.config.Config
+import eos.moe.dragoncore.database.IDataBase.Callback
 import eos.moe.dragoncore.network.PacketSender
 import org.bukkit.Bukkit
+import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.Plugin
 import top.wcpe.coregui.gui.AbstractGui
 import top.wcpe.dragoncoregui.DragonCoreGui
 import java.io.File
+import java.util.function.Consumer
 
 /**
  * 由 WCPE 在 2024/4/5 16:19 创建
@@ -161,5 +164,33 @@ class CoreManagerDragonCoreImpl(private val dragonCorePlugin: Plugin) : CoreMana
     override fun getCacheSlotItem(player: Player, identifier: String): ItemStack? {
         return SlotAPI.getCacheSlotItem(player, identifier)
     }
+
+    companion object {
+        @JvmStatic
+        private val emptyItemStack = ItemStack(Material.AIR)
+    }
+
+    override fun consumerSlotItem(
+        player: Player,
+        identifier: String,
+        success: Consumer<ItemStack?>,
+        fail: Runnable,
+    ) {
+        SlotAPI.getSlotItem(player, identifier, object : Callback<ItemStack> {
+            override fun onResult(itemStack: ItemStack?) {
+                success.accept(itemStack)
+            }
+
+            override fun onFail() {
+                fail.run()
+            }
+
+        })
+    }
+
+    override fun setSlotItem(player: Player, identifier: String, itemStack: ItemStack?, syncToClient: Boolean) {
+        SlotAPI.setSlotItem(player, identifier, itemStack ?: emptyItemStack, syncToClient)
+    }
+
 
 }

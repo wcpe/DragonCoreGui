@@ -4,6 +4,7 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import top.wcpe.coregui.gui.AbstractGui
 import java.io.File
+import java.util.function.Consumer
 
 /**
  * 由 WCPE 在 2024/4/5 16:18 创建
@@ -123,5 +124,13 @@ interface CoreManager {
 
     fun getCacheSlotItem(player: Player, identifier: String): ItemStack?
 
+    fun consumerSlotItem(
+        player: Player,
+        identifier: String,
+        success: Consumer<ItemStack?>,
+        fail: Runnable ,
+    )
+
+    fun setSlotItem(player: Player, identifier: String, itemStack: ItemStack?, syncToClient: Boolean)
 
 }

@@ -176,7 +176,7 @@ class DragonCoreGui : JavaPlugin() {
                 if (arg1 == "openGui") {
                     val playerExact = getPlayer(sender, arg2) ?: return
                     coreManager.openGui(playerExact, arg3)
-                    sender.sendMessage("已发送界面 [$arg3] 打开请求至玩家 [$playerExact] !")
+                    sender.sendMessage("已发送界面 [$arg3] 打开请求至玩家 [${playerExact.name}] !")
                     return
                 }
                 if (arg1 == "document") {

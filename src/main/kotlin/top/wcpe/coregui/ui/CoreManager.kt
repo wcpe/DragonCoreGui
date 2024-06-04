@@ -38,8 +38,7 @@ interface CoreManager {
                 return@mapNotNull null
             }
             val fullPathWithoutExtension = fullPath.substring(0, lastDotIndex)
-
-            return@mapNotNull fullPathWithoutExtension
+            return@mapNotNull fullPathWithoutExtension.replace("${File.separatorChar}", "/")
         }.toList()
     }
 
@@ -128,7 +127,7 @@ interface CoreManager {
         player: Player,
         identifier: String,
         success: Consumer<ItemStack?>,
-        fail: Runnable ,
+        fail: Runnable,
     )
 
     fun setSlotItem(player: Player, identifier: String, itemStack: ItemStack?, syncToClient: Boolean)

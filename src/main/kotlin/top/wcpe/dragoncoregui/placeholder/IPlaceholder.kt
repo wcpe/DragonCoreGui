@@ -50,7 +50,7 @@ interface IPlaceholder {
             data[format] = value
         }
         top.wcpe.dragoncoregui.extend.sendPlaceholder(
-            player.player, data
+            player, data
         )
     }
 
@@ -60,7 +60,7 @@ interface IPlaceholder {
             data[format] = value
         }
         top.wcpe.dragoncoregui.extend.sendPlaceholder(
-            player.player, data
+            player, data
         )
     }
 

@@ -21,9 +21,6 @@ interface IPlaceholder {
 
     fun getSubPlaceholder(): SubPlaceholder? {
         val className = javaClass.simpleName
-        DragonCoreGui.debug { logger ->
-            logger.info("find sub placeholder for $className")
-        }
         val placeholder = placeholderManager.getPlaceholder(className) ?: return null
         return placeholder.placeholderMap[key]
     }
@@ -131,47 +128,22 @@ interface IPlaceholder {
     }
 
     fun oldCompatibleFormat(args: Array<Pair<String, String>>): String {
-        val subPlaceholder = getSubPlaceholder()
-        if (subPlaceholder == null) {
-            DragonCoreGui.debug { logger ->
-                logger.info("Can't find sub placeholder for $key")
-            }
-            return ""
-        }
+        val subPlaceholder = getSubPlaceholder() ?: return ""
         return format(subPlaceholder.oldCompatibleFormat, args, false)
     }
 
     fun oldCompatibleFormats(args: Array<Pair<String, String>>): List<String> {
-        val subPlaceholder = getSubPlaceholder()
-        if (subPlaceholder == null) {
-            DragonCoreGui.debug { logger ->
-                logger.info("Can't find sub placeholder for $key")
-            }
-            return listOf()
-        }
+        val subPlaceholder = getSubPlaceholder() ?: return listOf()
         return subPlaceholder.oldCompatibleFormats.filter { it.isEmpty() }.map { format(it, args, false) }
     }
 
     fun format(args: Array<Pair<String, String>>, hasPrefix: Boolean = true): String {
-        val subPlaceholder = getSubPlaceholder()
-        if (subPlaceholder == null) {
-            DragonCoreGui.debug { logger ->
-                logger.info("Can't find sub placeholder for $key")
-            }
-            return ""
-        }
+        val subPlaceholder = getSubPlaceholder() ?: return ""
         return format(subPlaceholder.format, args)
     }
 
     fun formats(args: Array<Pair<String, String>>, hasPrefix: Boolean = true): List<String> {
-        val subPlaceholder = getSubPlaceholder()
-        if (subPlaceholder == null) {
-            DragonCoreGui.debug { logger ->
-                logger.info("Can't find sub placeholder for $key")
-            }
-            return listOf()
-        }
-
-        return subPlaceholder.formats.filter { it.isEmpty() }.map { format(it, args) }
+        val subPlaceholder = getSubPlaceholder() ?: return listOf()
+        return subPlaceholder.formats.filter { it.isNotEmpty() }.map { format(it, args) }
     }
 }

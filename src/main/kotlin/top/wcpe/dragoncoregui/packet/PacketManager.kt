@@ -10,8 +10,6 @@ import top.wcpe.dragoncoregui.packet.annotation.SinglePacket
 import top.wcpe.dragoncoregui.packet.extend.parentPacket
 import top.wcpe.dragoncoregui.packet.extend.singlePacket
 import kotlin.reflect.KClass
-import kotlin.reflect.full.createInstance
-import kotlin.reflect.full.findAnnotation
 
 /**
  * 由 WCPE 在 2024/1/14 17:09 创建
@@ -88,14 +86,29 @@ object PacketManager {
     }
 
 
-    private fun parseAnnotation(commandClass: KClass<*>): AbstractPacket? {
+    private fun parseAnnotation(commandClass: Class<*>): AbstractPacket? {
         return parseSinglePacket(commandClass) ?: parseParentPacket(commandClass)
     }
 
-    private fun parseSinglePacket(commandClass: KClass<*>): AbstractPacket? {
-        val singlePacketAnnotation = commandClass.findAnnotation<SinglePacket>() ?: return null
+    private inline fun <reified T> findAnnotation(commandClass: Class<*>): T? {
+        for (annotation in commandClass.annotations) {
+            if (annotation is T) {
+                return annotation
+            }
+        }
+        return null
+    }
 
-        val newInstance = commandClass.createInstance()
+    private fun newInstance(clazz: Class<*>): Any? {
+        val constructor = clazz.getDeclaredConstructor()
+        constructor.isAccessible = true
+        return constructor.newInstance()
+    }
+
+    private fun parseSinglePacket(commandClass: Class<*>): AbstractPacket? {
+        val singlePacketAnnotation = findAnnotation<SinglePacket>(commandClass) ?: return null
+
+        val newInstance = newInstance(commandClass)
 
         return singlePacket(
             singlePacketAnnotation.name,
@@ -113,8 +126,8 @@ object PacketManager {
         )
     }
 
-    private fun parseParentPacket(commandClass: KClass<*>): AbstractPacket? {
-        val parentPacketAnnotation = commandClass.findAnnotation<ParentPacket>() ?: return null
+    private fun parseParentPacket(commandClass: Class<*>): AbstractPacket? {
+        val parentPacketAnnotation = findAnnotation<ParentPacket>(commandClass) ?: return null
 
         val parentPacket = parentPacket(
             parentPacketAnnotation.name,
@@ -122,7 +135,7 @@ object PacketManager {
             parentPacketAnnotation.usageMessage,
         )
 
-        for (nestedClass in commandClass.nestedClasses) {
+        for (nestedClass in commandClass.declaredClasses) {
             parentPacket.addChildPacket(parseChildPacket(parentPacket, nestedClass) ?: continue)
         }
 
@@ -130,11 +143,11 @@ object PacketManager {
     }
 
     private fun parseChildPacket(
-        parentInstance: top.wcpe.dragoncoregui.packet.ParentPacket, commandClass: KClass<*>,
+        parentInstance: top.wcpe.dragoncoregui.packet.ParentPacket, commandClass: Class<*>,
     ): top.wcpe.dragoncoregui.packet.ChildPacket? {
-        val childPacketAnnotation = commandClass.findAnnotation<ChildPacket>() ?: return null
+        val childPacketAnnotation = findAnnotation<ChildPacket>(commandClass) ?: return null
 
-        val newInstance = commandClass.createInstance()
+        val newInstance = newInstance(commandClass)
 
         return parentInstance.childPacket(
             childPacketAnnotation.name,
@@ -175,7 +188,7 @@ object PacketManager {
      */
     @JvmStatic
     fun registerPacket(commandClass: KClass<*>, pluginInstance: Any): Boolean {
-        val parseAnnotation = parseAnnotation(commandClass) ?: return false
+        val parseAnnotation = parseAnnotation(commandClass.java) ?: return false
         return registerPacket(parseAnnotation, pluginInstance)
     }
 }

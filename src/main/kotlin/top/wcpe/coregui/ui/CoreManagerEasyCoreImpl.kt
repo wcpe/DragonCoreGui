@@ -5,7 +5,6 @@ import com.yuankong.easycore.api.ui.SlotAPI
 import com.yuankong.easycore.api.ui.UiConfig
 import com.yuankong.easycore.config.Config
 import com.yuankong.easycore.packet.PacketUtil
-import eos.moe.dragoncore.database.IDataBase.Callback
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -14,7 +13,6 @@ import top.wcpe.coregui.gui.AbstractGui
 import top.wcpe.dragoncoregui.DragonCoreGui
 import java.io.File
 import java.util.function.Consumer
-import java.util.function.Supplier
 
 /**
  * 由 WCPE 在 2024/4/5 16:19 创建
@@ -177,7 +175,12 @@ class CoreManagerEasyCoreImpl(private val easyCorePlugin: Plugin) : CoreManager 
         success: Consumer<ItemStack?>,
         fail: Runnable,
     ) {
-
+        try {
+            val extraSlotItem = SlotAPI.getExtraSlotItem(player, identifier)
+            success.accept(extraSlotItem)
+        }catch (e:Exception){
+            fail.run()
+        }
     }
 
     override fun setSlotItem(player: Player, identifier: String, itemStack: ItemStack?, syncToClient: Boolean) {

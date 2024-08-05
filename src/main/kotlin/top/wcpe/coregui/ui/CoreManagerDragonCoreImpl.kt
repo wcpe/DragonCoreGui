@@ -28,7 +28,7 @@ import java.util.function.Consumer
  * @author : WCPE
  * @since  : v2.0.0-SNAPSHOT
  */
-class CoreManagerDragonCoreImpl(private val dragonCorePlugin: Plugin) : CoreManager {
+class CoreManagerDragonCoreImpl(dragonCorePlugin: Plugin) : CoreManager {
 
     private val guiDirFile = File(dragonCorePlugin.dataFolder, "Gui")
 
@@ -137,7 +137,7 @@ class CoreManagerDragonCoreImpl(private val dragonCorePlugin: Plugin) : CoreMana
     /**
      * 发送客户端格子物品
      */
-    override fun putClientSlotItem(player: Player, slotIdentity: String, itemStack: ItemStack) {
+    override fun putClientSlotItem(player: Player, slotIdentity: String, itemStack: ItemStack?) {
         PacketSender.putClientSlotItem(player, slotIdentity, itemStack)
     }
 

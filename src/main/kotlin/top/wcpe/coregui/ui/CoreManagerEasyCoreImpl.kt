@@ -139,7 +139,7 @@ class CoreManagerEasyCoreImpl(private val easyCorePlugin: Plugin) : CoreManager 
     /**
      * 发送客户端格子物品
      */
-    override fun putClientSlotItem(player: Player, slotIdentity: String, itemStack: ItemStack) {
+    override fun putClientSlotItem(player: Player, slotIdentity: String, itemStack: ItemStack?) {
         SlotAPI.sendCacheItemStack(player, slotIdentity, itemStack)
     }
 

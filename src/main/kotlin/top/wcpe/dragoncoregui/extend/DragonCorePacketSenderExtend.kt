@@ -108,7 +108,7 @@ fun sendAsyncPlaceholder(vararg players: Player, asyncGet: (Player) -> Map<Strin
 /**
  * 发送客户端格子物品
  */
-fun putClientSlotItem(player: Player, slotIdentity: String, itemStack: ItemStack) {
+fun putClientSlotItem(player: Player, slotIdentity: String, itemStack: ItemStack?) {
     DragonCoreGui.coreManager.putClientSlotItem(player, slotIdentity, itemStack)
 }
 

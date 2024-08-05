@@ -108,7 +108,7 @@ interface CoreManager {
     /**
      * 发送客户端格子物品
      */
-    fun putClientSlotItem(player: Player, slotIdentity: String, itemStack: ItemStack)
+    fun putClientSlotItem(player: Player, slotIdentity: String, itemStack: ItemStack?)
 
     fun sendYaml(player: Player, abstractGui: AbstractGui)
 
